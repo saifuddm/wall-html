@@ -10,6 +10,7 @@ export function calculateCharacterLayout(
   charHeight: number,
   showTextLength: number,
 ): CharacterLayout | null {
+  console.log("showTextLength", showTextLength);
   if (contentWidth <= 0 || contentHeight <= 0 || charWidth <= 0 || charHeight <= 0) {
     return null;
   }

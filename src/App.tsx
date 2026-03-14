@@ -4,13 +4,23 @@ import { generateRandomCharacters, splitIntoGraphemes } from "./utils/text";
 import { getRenderParams } from "./utils/urlParams";
 
 function App() {
-  const { showText, renderWidth, renderHeight } = useMemo(
-    () => getRenderParams(window.location.search),
-    [],
-  );
+  const { showText, renderWidth, renderHeight, spaceWithRandomCharacters } =
+    useMemo(() => getRenderParams(window.location.search), []);
 
   const showTextChars = useMemo(() => splitIntoGraphemes(showText), [showText]);
-  const showTextLength = showTextChars.length;
+  const showTextLength = useMemo(() => {
+    let nonSpaceCount = 0;
+    let spaceCount = 0;
+    for (let i = 0; i < showTextChars.length; i++) {
+      if (showTextChars[i] === " ") {
+        spaceCount += 1;
+      } else {
+        nonSpaceCount += 1;
+      }
+    }
+
+    return nonSpaceCount + spaceCount * spaceWithRandomCharacters;
+  }, [showTextChars, spaceWithRandomCharacters]);
   const { contentRef, measureCharRef, layoutState } =
     useCharacterLayout(showTextLength);
 
@@ -31,15 +41,35 @@ function App() {
         </span>,
       );
     }
+    let showTextTokenIndex = 0;
     for (let i = 0; i < showTextChars.length; i++) {
+      if (showTextChars[i] === " " && spaceWithRandomCharacters > 0) {
+        const randomSpaceCharacters = generateRandomCharacters(
+          spaceWithRandomCharacters,
+        );
+        for (let j = 0; j < randomSpaceCharacters.length; j++) {
+          spans.push(
+            <span
+              key={`show-text-space-random-${showTextTokenIndex}`}
+              className="inline-flex w-[1ch] opacity-25"
+            >
+              {randomSpaceCharacters[j]}
+            </span>,
+          );
+          showTextTokenIndex += 1;
+        }
+        continue;
+      }
+
       spans.push(
         <span
-          key={`show-text-${i}`}
+          key={`show-text-${showTextTokenIndex}`}
           className="inline-flex w-[1ch] opacity-100"
         >
           {showTextChars[i]}
         </span>,
       );
+      showTextTokenIndex += 1;
     }
     for (let i = 0; i < after.length; i++) {
       spans.push(
@@ -52,7 +82,12 @@ function App() {
       );
     }
     return spans;
-  }, [randomCharacters, layoutState.splitIndex, showTextChars]);
+  }, [
+    randomCharacters,
+    layoutState.splitIndex,
+    showTextChars,
+    spaceWithRandomCharacters,
+  ]);
 
   return (
     <div
