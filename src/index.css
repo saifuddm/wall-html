@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  /* Doto as a named font utility (e.g. font-doto) and as default sans */
+  --font-doto: "Doto", ui-monospace, monospace;
+  --font-sans: var(--font-doto);
+}
+
+/* Apply Doto globally so font-weight utilities work everywhere */
+body {
+  font-family: var(--font-doto);
+}
