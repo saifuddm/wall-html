@@ -1,8 +1,6 @@
-import { mkdir } from "node:fs/promises";
+import { access, mkdir } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
-import { once } from "node:events";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,12 +10,12 @@ const projectRoot = path.resolve(__dirname, "..");
 const DEFAULT_TEXT = "Hello, World!";
 const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
-const BASE_PORT = 4173;
+const DEFAULT_SPACE_WITH_RANDOM_CHARACTERS = 2;
 
 function parsePositiveInt(value, fallback, name) {
   if (value === undefined) return fallback;
   const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     throw new Error(
       `Invalid --${name} value "${value}". Expected a positive integer.`,
     );
@@ -31,13 +29,14 @@ function parseArgs(argv) {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
     out: undefined,
+    spaceWithRandomCharacters: DEFAULT_SPACE_WITH_RANDOM_CHARACTERS,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith("--")) {
       throw new Error(
-        `Unknown argument "${token}". Use --text --width --height --out.`,
+        `Unknown argument "${token}". Use --text --width --height --out --spaceWithRandomCharacters.`,
       );
     }
     const key = token.slice(2);
@@ -53,6 +52,12 @@ function parseArgs(argv) {
     else if (key === "height")
       args.height = parsePositiveInt(value, DEFAULT_HEIGHT, "height");
     else if (key === "out") args.out = value;
+    else if (key === "spaceWithRandomCharacters")
+      args.spaceWithRandomCharacters = parsePositiveInt(
+        value,
+        DEFAULT_SPACE_WITH_RANDOM_CHARACTERS,
+        "spaceWithRandomCharacters",
+      );
     else throw new Error(`Unknown option "${token}".`);
   }
 
@@ -61,118 +66,47 @@ function parseArgs(argv) {
   return args;
 }
 
-function runCommand(command, commandArgs) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, commandArgs, {
-      cwd: projectRoot,
-      stdio: "inherit",
-      shell: process.platform === "win32",
-    });
-
-    child.on("error", reject);
-    child.on("exit", (code) => {
-      if (code === 0) resolve();
-      else
-        reject(
-          new Error(
-            `Command failed: ${command} ${commandArgs.join(" ")} (exit ${
-              code ?? "null"
-            })`,
-          ),
-        );
-    });
-  });
-}
-
-async function waitForServer(url, timeoutMs = 30_000) {
-  const started = Date.now();
-  while (Date.now() - started < timeoutMs) {
-    try {
-      const response = await fetch(url, { method: "GET" });
-      if (response.ok) return;
-    } catch {
-      // Keep polling until timeout.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 250));
-  }
-  throw new Error(`Timed out waiting for preview server at ${url}.`);
-}
-
-async function stopProcessTree(child) {
-  if (!child || child.exitCode !== null || child.pid === undefined) return;
-
-  if (process.platform === "win32") {
-    await runCommand("taskkill", ["/pid", String(child.pid), "/t", "/f"]).catch(
-      () => {},
+async function assertWallpaperBuildExists(wallpaperHtmlPath) {
+  try {
+    await access(wallpaperHtmlPath);
+  } catch {
+    throw new Error(
+      `Missing build artifact at ${wallpaperHtmlPath}. Run "bun run build" before generating a wallpaper.`,
     );
-  } else {
-    child.kill("SIGTERM");
   }
-
-  await Promise.race([
-    once(child, "exit"),
-    new Promise((resolve) => setTimeout(resolve, 4_000)),
-  ]);
 }
 
 async function main() {
-  const { text, width, height, out } = parseArgs(process.argv.slice(2));
+  const { text, width, height, out, spaceWithRandomCharacters } = parseArgs(
+    process.argv.slice(2),
+  );
   const outputPath = path.resolve(projectRoot, out);
   await mkdir(path.dirname(outputPath), { recursive: true });
-
-  const port = BASE_PORT + Math.floor(Math.random() * 1000);
-  const baseUrl = `http://127.0.0.1:${port}`;
-  const params = new URLSearchParams({
+  const wallpaperHtmlPath = path.resolve(projectRoot, "dist", "wallpaper.html");
+  await assertWallpaperBuildExists(wallpaperHtmlPath);
+  const wallpaperUrl = pathToFileURL(wallpaperHtmlPath);
+  wallpaperUrl.search = new URLSearchParams({
     text,
     width: String(width),
     height: String(height),
+    spaceWithRandomCharacters: String(spaceWithRandomCharacters),
+  }).toString();
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--allow-file-access-from-files", "--disable-web-security"],
   });
-  const wallpaperUrl = `${baseUrl}/?${params.toString()}`;
-
-  await runCommand("bun", ["run", "build"]);
-
-  const previewProcess = spawn(
-    "bun",
-    [
-      "run",
-      "preview",
-      "--",
-      "--host",
-      "127.0.0.1",
-      "--port",
-      String(port),
-      "--strictPort",
-    ],
-    {
-      cwd: projectRoot,
-      stdio: "inherit",
-      shell: process.platform === "win32",
-    },
-  );
-
   try {
-    await waitForServer(baseUrl);
-
-    const browser = await chromium.launch({ headless: true });
-    try {
-      const page = await browser.newPage({
-        viewport: { width, height },
-      });
-      await page.goto(wallpaperUrl, { waitUntil: "networkidle" });
-      await page.evaluate(async () => {
-        if (document.fonts?.ready) await document.fonts.ready;
-        await new Promise((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(resolve)),
-        );
-      });
-      await page.screenshot({
-        path: outputPath,
-      });
-    } finally {
-      await browser.close();
-    }
+    const page = await browser.newPage({
+      viewport: { width, height },
+    });
+    await page.goto(wallpaperUrl.href, { waitUntil: "networkidle" });
+    await page.waitForFunction(() => window.__wallpaperReady === true);
+    await page.screenshot({
+      path: outputPath,
+    });
   } finally {
-    await stopProcessTree(previewProcess);
+    await browser.close();
   }
 
   console.log(`Wallpaper generated: ${outputPath}`);

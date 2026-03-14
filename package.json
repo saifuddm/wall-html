@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "wallpaper": "node scripts/generate-wallpaper.mjs"
+    "wallpaper:build": "bun run build",
+    "wallpaper:capture": "node scripts/generate-wallpaper.mjs",
+    "wallpaper": "bun run wallpaper:build && bun run wallpaper:capture"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
