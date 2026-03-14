@@ -12,17 +12,26 @@ const projectRoot = path.resolve(__dirname, "..");
 const DEFAULT_TEXT = "Hello, World!";
 const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
+const DEFAULT_SPACE_WITH_RANDOM_CHARACTERS = 2;
+const DEFAULT_REPLACE_BLANK_SPACE = false;
 const BASE_PORT = 4173;
 
 function parsePositiveInt(value, fallback, name) {
   if (value === undefined) return fallback;
   const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     throw new Error(
       `Invalid --${name} value "${value}". Expected a positive integer.`,
     );
   }
   return parsed;
+}
+
+function parseBoolean(value, fallback, name) {
+  if (value === undefined) return fallback;
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`Invalid --${name} value "${value}". Expected a boolean.`);
 }
 
 function parseArgs(argv) {
@@ -31,6 +40,8 @@ function parseArgs(argv) {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT,
     out: undefined,
+    spaceWithRandomCharacters: DEFAULT_SPACE_WITH_RANDOM_CHARACTERS,
+    replaceBlankSpace: DEFAULT_REPLACE_BLANK_SPACE,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -52,6 +63,18 @@ function parseArgs(argv) {
       args.width = parsePositiveInt(value, DEFAULT_WIDTH, "width");
     else if (key === "height")
       args.height = parsePositiveInt(value, DEFAULT_HEIGHT, "height");
+    else if (key === "spaceWithRandomCharacters")
+      args.spaceWithRandomCharacters = parsePositiveInt(
+        value,
+        DEFAULT_SPACE_WITH_RANDOM_CHARACTERS,
+        "spaceWithRandomCharacters",
+      );
+    else if (key === "replaceBlankSpace")
+      args.replaceBlankSpace = parseBoolean(
+        value,
+        DEFAULT_REPLACE_BLANK_SPACE,
+        "replaceBlankSpace",
+      );
     else if (key === "out") args.out = value;
     else throw new Error(`Unknown option "${token}".`);
   }
@@ -116,7 +139,14 @@ async function stopProcessTree(child) {
 }
 
 async function main() {
-  const { text, width, height, out } = parseArgs(process.argv.slice(2));
+  const {
+    text,
+    width,
+    height,
+    out,
+    spaceWithRandomCharacters,
+    replaceBlankSpace,
+  } = parseArgs(process.argv.slice(2));
   const outputPath = path.resolve(projectRoot, out);
   await mkdir(path.dirname(outputPath), { recursive: true });
 
@@ -126,6 +156,8 @@ async function main() {
     text,
     width: String(width),
     height: String(height),
+    spaceWithRandomCharacters: String(spaceWithRandomCharacters),
+    replaceBlankSpace: String(replaceBlankSpace),
   });
   const wallpaperUrl = `${baseUrl}/?${params.toString()}`;
 

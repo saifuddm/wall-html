@@ -4,8 +4,13 @@ import { generateRandomCharacters, splitIntoGraphemes } from "./utils/text";
 import { getRenderParams } from "./utils/urlParams";
 
 function App() {
-  const { showText, renderWidth, renderHeight, spaceWithRandomCharacters } =
-    useMemo(() => getRenderParams(window.location.search), []);
+  const {
+    showText,
+    renderWidth,
+    renderHeight,
+    spaceWithRandomCharacters,
+    replaceBlankSpace,
+  } = useMemo(() => getRenderParams(window.location.search), []);
 
   const showTextChars = useMemo(() => splitIntoGraphemes(showText), [showText]);
   const showTextLength = useMemo(() => {
@@ -19,8 +24,11 @@ function App() {
       }
     }
 
-    return nonSpaceCount + spaceCount * spaceWithRandomCharacters;
-  }, [showTextChars, spaceWithRandomCharacters]);
+    if (replaceBlankSpace) {
+      return nonSpaceCount + spaceCount * spaceWithRandomCharacters;
+    }
+    return nonSpaceCount + spaceCount;
+  }, [showTextChars, spaceWithRandomCharacters, replaceBlankSpace]);
   const { contentRef, measureCharRef, layoutState } =
     useCharacterLayout(showTextLength);
 
@@ -42,8 +50,10 @@ function App() {
       );
     }
     let showTextTokenIndex = 0;
+    console.debug("showTextChars", showTextChars);
+    console.debug("spaceWithRandomCharacters", spaceWithRandomCharacters);
     for (let i = 0; i < showTextChars.length; i++) {
-      if (showTextChars[i] === " " && spaceWithRandomCharacters > 0) {
+      if (showTextChars[i] === " " && replaceBlankSpace) {
         const randomSpaceCharacters = generateRandomCharacters(
           spaceWithRandomCharacters,
         );
