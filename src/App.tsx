@@ -1,47 +1,29 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-
-const DEFAULT_TEXT = "Build. Ship. Repeat. 🚀 ";
-
-function parsePositiveInt(value: string | null): number | null {
-  if (!value) return null;
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-}
+import { useMemo } from "react";
+import { useCharacterLayout } from "./hooks/useCharacterLayout";
+import { generateRandomCharacters, splitIntoGraphemes } from "./utils/text";
+import { getRenderParams } from "./utils/urlParams";
 
 function App() {
-  const params = useMemo(() => new URLSearchParams(window.location.search), []);
-  const showText = params.get("text")?.trim() || DEFAULT_TEXT;
-  const renderWidth = parsePositiveInt(params.get("width"));
-  const renderHeight = parsePositiveInt(params.get("height"));
+  const { showText, renderWidth, renderHeight } = useMemo(
+    () => getRenderParams(window.location.search),
+    [],
+  );
 
-  const showTextChars = useMemo(() => {
-    if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
-      const segmenter = new Intl.Segmenter(undefined, {
-        granularity: "grapheme",
-      });
-      return Array.from(segmenter.segment(showText), (s) => s.segment);
-    }
-    return Array.from(showText);
-  }, [showText]);
+  const showTextChars = useMemo(() => splitIntoGraphemes(showText), [showText]);
   const showTextLength = showTextChars.length;
-  const contentRef = useRef<HTMLDivElement>(null);
-  const measureCharRef = useRef<HTMLSpanElement>(null);
-  const [splitIndex, setSplitIndex] = useState(0);
-  const [characterCount, setCharacterCount] = useState(0);
+  const { contentRef, measureCharRef, layoutState } =
+    useCharacterLayout(showTextLength);
 
   // Generate only as many random characters as fit in the content area (computed after measure)
   const randomCharacters = useMemo(() => {
-    if (characterCount <= 0) return "";
-    return Array.from({ length: characterCount }, () =>
-      String.fromCharCode(Math.floor(Math.random() * 26) + 97),
-    ).join("");
-  }, [characterCount]);
+    return generateRandomCharacters(layoutState.characterCount);
+  }, [layoutState.characterCount]);
 
   // Build array of spans: each random char is its own span (opacity-25), SHOW_TEXT is one span (opacity-100)
   const characterSpans = useMemo(() => {
     const spans: React.ReactNode[] = [];
-    const before = randomCharacters.slice(0, splitIndex);
-    const after = randomCharacters.slice(splitIndex);
+    const before = randomCharacters.slice(0, layoutState.splitIndex);
+    const after = randomCharacters.slice(layoutState.splitIndex);
     for (let i = 0; i < before.length; i++) {
       spans.push(
         <span key={`before-${i}`} className="inline-flex w-[1ch] opacity-25">
@@ -62,7 +44,7 @@ function App() {
     for (let i = 0; i < after.length; i++) {
       spans.push(
         <span
-          key={`after-${splitIndex + i}`}
+          key={`after-${layoutState.splitIndex + i}`}
           className="inline-flex w-[1ch] opacity-25"
         >
           {after[i]}
@@ -70,51 +52,7 @@ function App() {
       );
     }
     return spans;
-  }, [randomCharacters, splitIndex, showTextChars]);
-
-  useLayoutEffect(() => {
-    const updateLayout = () => {
-      if (!contentRef.current || !measureCharRef.current) return;
-      const contentRect = contentRef.current.getBoundingClientRect();
-      const charRect = measureCharRef.current.getBoundingClientRect();
-      const charWidth = charRect.width;
-      const charHeight = charRect.height;
-      if (charWidth <= 0 || charHeight <= 0) return;
-
-      const charsPerLine = Math.max(
-        0,
-        Math.floor(contentRect.width / charWidth),
-      );
-      const totalLines = Math.max(
-        0,
-        Math.ceil(contentRect.height / charHeight),
-      );
-      const totalSlots = totalLines * charsPerLine;
-      const randomCharsNeeded = Math.max(0, totalSlots - showTextLength);
-      const splitIndexValue = Math.floor(randomCharsNeeded / 2);
-
-      setCharacterCount((prev) =>
-        prev !== randomCharsNeeded ? randomCharsNeeded : prev,
-      );
-      setSplitIndex((prev) => {
-        const next = Math.max(0, Math.min(splitIndexValue, randomCharsNeeded));
-        return next !== prev ? next : prev;
-      });
-    };
-
-    const onResize = () => updateLayout();
-    const onFontsLoadingDone = () => updateLayout();
-
-    updateLayout();
-    window.addEventListener("resize", onResize);
-    document.fonts?.addEventListener?.("loadingdone", onFontsLoadingDone);
-    document.fonts?.ready?.then(updateLayout).catch(() => {});
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      document.fonts?.removeEventListener?.("loadingdone", onFontsLoadingDone);
-    };
-  }, [showTextLength]);
+  }, [randomCharacters, layoutState.splitIndex, showTextChars]);
 
   return (
     <div
