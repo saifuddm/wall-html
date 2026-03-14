@@ -1,16 +1,28 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
+const DEFAULT_TEXT = "Build. Ship. Repeat. 🚀 ";
+
+function parsePositiveInt(value: string | null): number | null {
+  if (!value) return null;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
 function App() {
-  const SHOW_TEXT = " This is a wall of text and its my background ";
+  const params = useMemo(() => new URLSearchParams(window.location.search), []);
+  const showText = params.get("text")?.trim() || DEFAULT_TEXT;
+  const renderWidth = parsePositiveInt(params.get("width"));
+  const renderHeight = parsePositiveInt(params.get("height"));
+
   const showTextChars = useMemo(() => {
     if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
       const segmenter = new Intl.Segmenter(undefined, {
         granularity: "grapheme",
       });
-      return Array.from(segmenter.segment(SHOW_TEXT), (s) => s.segment);
+      return Array.from(segmenter.segment(showText), (s) => s.segment);
     }
-    return Array.from(SHOW_TEXT);
-  }, [SHOW_TEXT]);
+    return Array.from(showText);
+  }, [showText]);
   const showTextLength = showTextChars.length;
   const contentRef = useRef<HTMLDivElement>(null);
   const measureCharRef = useRef<HTMLSpanElement>(null);
@@ -32,7 +44,7 @@ function App() {
     const after = randomCharacters.slice(splitIndex);
     for (let i = 0; i < before.length; i++) {
       spans.push(
-        <span key={`before-${i}`} className="inline-flex opacity-25">
+        <span key={`before-${i}`} className="inline-flex w-[1ch] opacity-25">
           {before[i]}
         </span>,
       );
@@ -51,7 +63,7 @@ function App() {
       spans.push(
         <span
           key={`after-${splitIndex + i}`}
-          className="inline-flex opacity-25"
+          className="inline-flex w-[1ch] opacity-25"
         >
           {after[i]}
         </span>,
@@ -71,7 +83,7 @@ function App() {
 
       const charsPerLine = Math.max(
         0,
-        Math.ceil(contentRect.width / charWidth),
+        Math.floor(contentRect.width / charWidth),
       );
       const totalLines = Math.max(
         0,
@@ -105,7 +117,13 @@ function App() {
   }, [showTextLength]);
 
   return (
-    <div className="w-screen h-screen bg-slate-800 text-9xl text-white uppercase text-wrap relative">
+    <div
+      className="bg-slate-800 text-9xl text-white text-wrap relative overflow-hidden"
+      style={{
+        width: renderWidth ? `${renderWidth}px` : "100vw",
+        height: renderHeight ? `${renderHeight}px` : "100vh",
+      }}
+    >
       {/* Single overlay frame using inset box-shadow */}
       <div
         className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_0_0_4rem_rgba(30,41,59,0.8)]"
@@ -113,7 +131,10 @@ function App() {
       />
 
       {/* Content wrapper: measured for split calculation */}
-      <div ref={contentRef} className="absolute inset-8 overflow-hidden">
+      <div
+        ref={contentRef}
+        className="absolute inset-8 overflow-hidden text-center"
+      >
         {/* Hidden span to measure single character width (same font as content) */}
         <span
           ref={measureCharRef}
@@ -123,7 +144,7 @@ function App() {
           a
         </span>
 
-        <p className="uppercase leading-none wrap-anywhere">{characterSpans}</p>
+        <p className="uppercase wrap-anywhere">{characterSpans}</p>
       </div>
     </div>
   );
