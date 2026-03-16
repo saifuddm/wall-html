@@ -5,32 +5,37 @@ import { getRenderParams } from "./utils/urlParams";
 
 function App() {
   const {
-    showText,
+    displayText,
     renderWidth,
     renderHeight,
     spaceWithRandomCharacters,
     replaceBlankSpace,
+    noWordWrap,
   } = useMemo(() => getRenderParams(window.location.search), []);
 
-  const showTextChars = useMemo(() => splitIntoGraphemes(showText), [showText]);
-  const showTextLength = useMemo(() => {
-    let nonSpaceCount = 0;
-    let spaceCount = 0;
-    for (let i = 0; i < showTextChars.length; i++) {
-      if (showTextChars[i] === " ") {
-        spaceCount += 1;
-      } else {
-        nonSpaceCount += 1;
-      }
-    }
-
+  const displayTextChars = useMemo(
+    () => splitIntoGraphemes(displayText),
+    [displayText],
+  );
+  const displayTextLength = useMemo(() => {
     if (replaceBlankSpace) {
+      let nonSpaceCount = 0;
+      let spaceCount = 0;
+      for (let i = 0; i < displayTextChars.length; i++) {
+        if (displayTextChars[i] === " ") {
+          spaceCount += 1;
+        } else {
+          nonSpaceCount += 1;
+        }
+      }
+
       return nonSpaceCount + spaceCount * spaceWithRandomCharacters;
     }
-    return nonSpaceCount + spaceCount;
-  }, [showTextChars, spaceWithRandomCharacters, replaceBlankSpace]);
+
+    return displayTextChars.length;
+  }, [displayTextChars, spaceWithRandomCharacters, replaceBlankSpace]);
   const { contentRef, measureCharRef, layoutState } =
-    useCharacterLayout(showTextLength);
+    useCharacterLayout(displayTextLength);
 
   // Generate only as many random characters as fit in the content area (computed after measure)
   const randomCharacters = useMemo(() => {
@@ -49,37 +54,37 @@ function App() {
         </span>,
       );
     }
-    let showTextTokenIndex = 0;
-    console.debug("showTextChars", showTextChars);
+    let displayTextTokenIndex = 0;
+    console.debug("displayTextChars", displayTextChars);
     console.debug("spaceWithRandomCharacters", spaceWithRandomCharacters);
-    for (let i = 0; i < showTextChars.length; i++) {
-      if (showTextChars[i] === " " && replaceBlankSpace) {
+    for (let i = 0; i < displayTextChars.length; i++) {
+      if (displayTextChars[i] === " " && replaceBlankSpace) {
         const randomSpaceCharacters = generateRandomCharacters(
           spaceWithRandomCharacters,
         );
         for (let j = 0; j < randomSpaceCharacters.length; j++) {
           spans.push(
             <span
-              key={`show-text-space-random-${showTextTokenIndex}`}
+              key={`show-text-space-random-${displayTextTokenIndex}`}
               className="inline-flex w-[1ch] opacity-25"
             >
               {randomSpaceCharacters[j]}
             </span>,
           );
-          showTextTokenIndex += 1;
+          displayTextTokenIndex += 1;
         }
         continue;
       }
 
       spans.push(
         <span
-          key={`show-text-${showTextTokenIndex}`}
+          key={`show-text-${displayTextTokenIndex}`}
           className="inline-flex w-[1ch] opacity-100"
         >
-          {showTextChars[i]}
+          {displayTextChars[i]}
         </span>,
       );
-      showTextTokenIndex += 1;
+      displayTextTokenIndex += 1;
     }
     for (let i = 0; i < after.length; i++) {
       spans.push(
@@ -95,7 +100,7 @@ function App() {
   }, [
     randomCharacters,
     layoutState.splitIndex,
-    showTextChars,
+    displayTextChars,
     spaceWithRandomCharacters,
   ]);
 

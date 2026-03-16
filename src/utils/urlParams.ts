@@ -1,6 +1,7 @@
 export const DEFAULT_TEXT = "There are things in the universe that are not yet known";
 export const DEFAULT_SPACE_WITH_RANDOM_CHARACTERS = 2;
 export const DEFAULT_REPLACE_BLANK_SPACE = false;
+export const DEFAULT_NO_WORD_WRAP = false;
 
 export function parsePositiveInt(value: string | null): number | null {
   if (!value) return null;
@@ -22,7 +23,7 @@ export function getRenderParams(search: string) {
   console.debug("params", params);
 
   return {
-    showText: params.get("text")?.trim() || DEFAULT_TEXT,
+    displayText: params.get("text")?.trim() || DEFAULT_TEXT,
     renderWidth: parsePositiveInt(params.get("width")),
     renderHeight: parsePositiveInt(params.get("height")),
     spaceWithRandomCharacters:
@@ -31,5 +32,8 @@ export function getRenderParams(search: string) {
     replaceBlankSpace:
       parseBoolean(params.get("replaceBlankSpace")) ||
       DEFAULT_REPLACE_BLANK_SPACE,
+    noWordWrap:
+      parseBoolean(params.get("noWordWrap")) ||
+      DEFAULT_NO_WORD_WRAP,
   };
 }
