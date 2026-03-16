@@ -5,6 +5,9 @@ export const renderer = jsxRenderer(({ children }) => {
   return (
     <html>
       <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Wall HTML Screenshot API</title>
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
       </head>
