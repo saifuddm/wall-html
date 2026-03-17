@@ -21,20 +21,23 @@ app.get("/", (c) => {
 });
 
 app.get("/text-background", (c) => {
-  const { width, height, displayText, randomTextToggle } = validateRoute(
-    c.req.query() as {
-      width: string;
-      height: string;
-      displayText: string;
-      randomTextToggle: string;
-    },
-  );
+  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
+    validateRoute(
+      c.req.query() as {
+        width: string;
+        height: string;
+        displayText: string;
+        randomTextToggle: string;
+        cutOffTextToggle: string;
+      },
+    );
   return c.render(
     <TextBackground
       width={width}
       height={height}
       displayText={displayText}
       randomTextToggle={randomTextToggle}
+      cutOffTextToggle={cutOffTextToggle}
     />,
   );
 });
@@ -46,7 +49,7 @@ app.get("/health", (c) => {
   });
 });
 
-app.get("/example-puppeteer", async (c) => {
+app.get("/screenshot", async (c) => {
   // Variables
   const width = 1290;
   const height = 2796;
@@ -64,9 +67,10 @@ app.get("/example-puppeteer", async (c) => {
   target.searchParams.set("height", height.toString());
   target.searchParams.set(
     "displayText",
-    "This is a test of the text background generator, but why",
+    "This is a test of the text background generator 🪨",
   );
   target.searchParams.set("randomTextToggle", "true");
+  target.searchParams.set("cutOffTextToggle", "true");
   console.log(target.toString());
 
   await page.goto(target.toString(), { waitUntil: "networkidle2" });

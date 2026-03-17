@@ -29,16 +29,19 @@ const validateRoute = ({
     height,
     displayText,
     randomTextToggle,
-}: { width: string, height: string, displayText: string, randomTextToggle: string }) => {
+    cutOffTextToggle,
+}: { width: string, height: string, displayText: string, randomTextToggle: string, cutOffTextToggle: string }) => {
     const parsedWidth = parseInteger("width", width);
     const parsedHeight = parseInteger("height", height);
     const parsedDisplayText = parseString("displayText", displayText);
-    const parsedRandomTextToggle = parseBoolean("randomTextToggle", randomTextToggle);
+    const parsedRandomTextToggle = randomTextToggle === undefined ? true : parseBoolean("randomTextToggle", randomTextToggle);
+    const parsedCutOffTextToggle = randomTextToggle === undefined ? true : parseBoolean("cutOffTextToggle", cutOffTextToggle);
     return {
         width: parsedWidth,
         height: parsedHeight,
         displayText: parsedDisplayText,
         randomTextToggle: parsedRandomTextToggle,
+        cutOffTextToggle: parsedCutOffTextToggle,
     }
 }
 
