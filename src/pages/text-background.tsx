@@ -147,20 +147,24 @@ const TextBackground = ({
   const remainingCharacters =
     totalNumberOfCharacters - displayTextElements.length;
 
+  console.log("display char", displayTextElements.length < cpl);
+
   // top half of random text
-  const topHalfRandomTextElements = cutOffTextToggle
-    ? getRandomText({
+  const topHalfRandomTextElements =
+    cutOffTextToggle && displayTextElements.length > cpl
+      ? getRandomText({
         charCount: Math.floor(remainingCharacters / 2 / cpl) * cpl,
       })
-    : getRandomText({
+      : getRandomText({
         charCount: remainingCharacters / 2,
       });
   // bottom half of random text
-  const bottomHalfRandomTextElements = cutOffTextToggle
-    ? getRandomText({
+  const bottomHalfRandomTextElements =
+    cutOffTextToggle && displayTextElements.length > cpl
+      ? getRandomText({
         charCount: remainingCharacters - topHalfRandomTextElements.length,
       })
-    : getRandomText({
+      : getRandomText({
         charCount: remainingCharacters - topHalfRandomTextElements.length,
       });
 
