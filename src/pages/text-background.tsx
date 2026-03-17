@@ -146,23 +146,26 @@ const TextBackground = ({
   });
   const remainingCharacters =
     totalNumberOfCharacters - displayTextElements.length;
+  console.log("display char", displayTextElements.length < cpl);
 
   // top half of random text
-  const topHalfRandomTextElements = cutOffTextToggle
-    ? getRandomText({
-        charCount: Math.floor(remainingCharacters / 2 / cpl) * cpl,
-      })
-    : getRandomText({
-        charCount: remainingCharacters / 2,
-      });
+  const topHalfRandomTextElements =
+    cutOffTextToggle && displayTextElements.length > cpl
+      ? getRandomText({
+          charCount: Math.floor(remainingCharacters / 2 / cpl) * cpl,
+        })
+      : getRandomText({
+          charCount: remainingCharacters / 2,
+        });
   // bottom half of random text
-  const bottomHalfRandomTextElements = cutOffTextToggle
-    ? getRandomText({
-        charCount: remainingCharacters - topHalfRandomTextElements.length,
-      })
-    : getRandomText({
-        charCount: remainingCharacters - topHalfRandomTextElements.length,
-      });
+  const bottomHalfRandomTextElements =
+    cutOffTextToggle && displayTextElements.length > cpl
+      ? getRandomText({
+          charCount: remainingCharacters - topHalfRandomTextElements.length,
+        })
+      : getRandomText({
+          charCount: remainingCharacters - topHalfRandomTextElements.length,
+        });
 
   return (
     <main class="bg-slate-800 text-9xl text-white relative overflow-hidden h-screen w-screen flex flex-col justify-center items-center">
