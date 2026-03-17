@@ -21,18 +21,18 @@ app.get("/", (c) => {
 });
 
 app.get("/text-background", (c) => {
-  const { cpl, lpp, displayText, randomTextToggle } = validateRoute(
+  const { width, height, displayText, randomTextToggle } = validateRoute(
     c.req.query() as {
-      cpl: string;
-      lpp: string;
+      width: string;
+      height: string;
       displayText: string;
       randomTextToggle: string;
     },
   );
   return c.render(
     <TextBackground
-      cpl={cpl}
-      lpp={lpp}
+      width={width}
+      height={height}
       displayText={displayText}
       randomTextToggle={randomTextToggle}
     />,
@@ -49,7 +49,6 @@ app.get("/health", (c) => {
 app.get("/example-puppeteer", async (c) => {
   // Variables
   const width = 1290;
-  const paddingX = 32 * 2;
   const height = 2796;
   // Build URL
   const origin = new URL(c.req.url).origin;
@@ -60,16 +59,15 @@ app.get("/example-puppeteer", async (c) => {
   await page.setViewport({ width, height });
 
   // Target URL with query parameters
-
   const target = new URL("/text-background", origin);
-
-  target.searchParams.set("cpl", calculateCpl(width - paddingX).toString());
-  target.searchParams.set("lpp", calculateLpp(height).toString());
+  target.searchParams.set("width", width.toString());
+  target.searchParams.set("height", height.toString());
   target.searchParams.set(
     "displayText",
-    "This is a test of the text background generator 🚀",
+    "This is a test of the text background generator, but why",
   );
   target.searchParams.set("randomTextToggle", "true");
+  console.log(target.toString());
 
   await page.goto(target.toString(), { waitUntil: "networkidle2" });
   const screenshot = await page.screenshot({ type: "png" });

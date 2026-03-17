@@ -25,20 +25,20 @@ const parseString = (key: string, value: string) => {
 }
 
 const validateRoute = ({
-    cpl,
-    lpp,
+    width,
+    height,
     displayText,
-    randomTextToggle
-}: { cpl: string, lpp: string, displayText: string, randomTextToggle: string }) => {
-    const parsedCpl = parseInteger("cpl", cpl);
-    const parsedLpp = parseInteger("lpp", lpp);
+    randomTextToggle,
+}: { width: string, height: string, displayText: string, randomTextToggle: string }) => {
+    const parsedWidth = parseInteger("width", width);
+    const parsedHeight = parseInteger("height", height);
     const parsedDisplayText = parseString("displayText", displayText);
     const parsedRandomTextToggle = parseBoolean("randomTextToggle", randomTextToggle);
     return {
-        cpl: parsedCpl,
-        lpp: parsedLpp,
+        width: parsedWidth,
+        height: parsedHeight,
         displayText: parsedDisplayText,
-        randomTextToggle: parsedRandomTextToggle
+        randomTextToggle: parsedRandomTextToggle,
     }
 }
 
@@ -46,10 +46,11 @@ const isEmoji = (ch: string) => /\p{Extended_Pictographic}/u.test(ch);
 
 // Calculators
 const fontSizePx = 128
+const paddingX = 32 * 2;
 const avgGlyphWidth = fontSizePx * 0.6;
 
 const calculateCpl = (width: number) => {
-    const cpl = Math.floor(width / avgGlyphWidth);
+    const cpl = Math.floor((width - paddingX) / avgGlyphWidth);
     console.log(`cpl: ${cpl}`);
     return cpl;
 }
