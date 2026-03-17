@@ -8,6 +8,7 @@ import {
   calculateLpp,
   validateRoute,
 } from "./utils/text-background-validation";
+import validateScreenshot from "./utils/screenshot-validator";
 
 type Bindings = {
   MYBROWSER: BrowserWorker;
@@ -50,9 +51,16 @@ app.get("/health", (c) => {
 });
 
 app.get("/screenshot", async (c) => {
-  // Variables
-  const width = 1290;
-  const height = 2796;
+  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
+    validateScreenshot(
+      c.req.query() as {
+        width: string;
+        height: string;
+        displayText: string;
+        randomTextToggle: string;
+        cutOffTextToggle: string;
+      },
+    );
   // Build URL
   const origin = new URL(c.req.url).origin;
   const browser = await puppeteer.launch(c.env.MYBROWSER, {
@@ -65,12 +73,9 @@ app.get("/screenshot", async (c) => {
   const target = new URL("/text-background", origin);
   target.searchParams.set("width", width.toString());
   target.searchParams.set("height", height.toString());
-  target.searchParams.set(
-    "displayText",
-    "This is a test of the text background generator 🪨",
-  );
-  target.searchParams.set("randomTextToggle", "true");
-  target.searchParams.set("cutOffTextToggle", "true");
+  target.searchParams.set("displayText", displayText);
+  target.searchParams.set("randomTextToggle", randomTextToggle.toString());
+  target.searchParams.set("cutOffTextToggle", cutOffTextToggle.toString());
   console.log(target.toString());
 
   await page.goto(target.toString(), { waitUntil: "networkidle2" });
