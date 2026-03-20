@@ -42,7 +42,7 @@ const getDisplayText = ({
   const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
   const displayTextElements: JSX.Element[] = [];
   let lineTracker = 0;
-  if (cutOffTextToggle) {
+  if (!cutOffTextToggle) {
     for (const word of wordMap) {
       let remainingCpl = cpl - displayTextElements.length + lineTracker * cpl;
 
@@ -102,6 +102,7 @@ const handleDisplayCharacter = ({
       <span class="opacity-100 font-emoji">{char}</span>,
     ];
   } else if (char === " ") {
+    console.log("space found, randomTextToggle", randomTextToggle);
     if (randomTextToggle) {
       return [
         <span class="opacity-25 font-display uppercase">
@@ -151,7 +152,7 @@ const TextBackground = ({
 
   // top half of random text
   const topHalfRandomTextElements =
-    cutOffTextToggle && displayTextElements.length > cpl
+    !cutOffTextToggle && displayTextElements.length > cpl
       ? getRandomText({
         charCount: Math.floor(remainingCharacters / 2 / cpl) * cpl,
       })
@@ -160,7 +161,7 @@ const TextBackground = ({
       });
   // bottom half of random text
   const bottomHalfRandomTextElements =
-    cutOffTextToggle && displayTextElements.length > cpl
+    !cutOffTextToggle && displayTextElements.length > cpl
       ? getRandomText({
         charCount: remainingCharacters - topHalfRandomTextElements.length,
       })
