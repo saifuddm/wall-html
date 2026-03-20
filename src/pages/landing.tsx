@@ -13,9 +13,10 @@ const LandingPage = () => {
             </h1>
             <p class="max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
               Use the <code class="rounded bg-slate-800 px-2 py-1 text-sm text-slate-100">/screenshot</code>{" "}
-              endpoint to render a text background and receive a PNG in
-              response. Choose the width, height, text, and toggle options
-              below, then open the generated request in a new tab.
+              endpoint for the original browser-binding flow, or <code class="rounded bg-slate-800 px-2 py-1 text-sm text-slate-100">/screenshot-rest-url</code>{" "}
+              for Cloudflare Browser Rendering REST URL mode. Choose the width,
+              height, text, and toggle options below, then open either request
+              in a new tab.
             </p>
 
           </div>
@@ -30,8 +31,9 @@ const LandingPage = () => {
               </h2>
               <p class="text-sm leading-7 text-slate-300 sm:text-base">
                 Build a GET request to the screenshot endpoint with the query
-                parameters below. The service renders a background page, takes
-                a screenshot at your chosen dimensions, and returns a PNG.
+                parameters below. Both services render the background page at
+                your chosen dimensions and return a PNG so you can compare the
+                results side by side.
               </p>
             </div>
 
@@ -63,6 +65,15 @@ const LandingPage = () => {
                   text can be cut off for a more graphic look.
                 </p>
               </li>
+              <li class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                <p class="text-sm font-semibold text-slate-100">
+                  4. Open either screenshot flow
+                </p>
+                <p class="mt-2 text-sm leading-6 text-slate-300">
+                  Use the original browser-binding route or the new REST URL
+                  route to compare output and performance in parallel.
+                </p>
+              </li>
             </ol>
 
           </div>
@@ -74,8 +85,8 @@ const LandingPage = () => {
                   Build a screenshot request
                 </h2>
                 <p class="text-sm leading-7 text-slate-300 sm:text-base">
-                  Enter the query values you want to send. Submitting this form
-                  opens the screenshot endpoint in a new browser tab.
+                  Enter the query values you want to send. Each button opens a
+                  different screenshot flow in a new browser tab.
                 </p>
               </div>
 
@@ -179,15 +190,24 @@ const LandingPage = () => {
 
                 <div class="flex flex-col gap-3 border-t border-slate-800 pt-2 sm:flex-row sm:items-center sm:justify-between">
                   <p class="text-sm leading-6 text-slate-400">
-                    The request opens in a new tab so you can view or save the
-                    generated PNG directly.
+                    Open the original browser-binding route or the new REST URL
+                    route to compare generated PNGs directly.
                   </p>
-                  <button
-                    class="inline-flex items-center justify-center rounded-full bg-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-300"
-                    type="submit"
-                  >
-                    Open screenshot URL
-                  </button>
+                  <div class="flex flex-col gap-3 sm:flex-row">
+                    <button
+                      class="inline-flex items-center justify-center rounded-full bg-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-300"
+                      type="submit"
+                    >
+                      Open /screenshot
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center rounded-full border border-sky-400 px-5 py-3 text-sm font-semibold text-sky-300 transition hover:border-sky-300 hover:text-sky-200"
+                      formAction="/screenshot-rest-url"
+                      type="submit"
+                    >
+                      Open /screenshot-rest-url
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

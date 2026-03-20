@@ -4,5 +4,8 @@
   "compatibility_date": "2025-08-03",
   "main": "./src/index.tsx",
   "workers_dev": true,
-  "compatibility_flags": ["nodejs_compat_v2"]
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "browser": {
+    "binding": "MYBROWSER"
+  }
 }

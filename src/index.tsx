@@ -1,16 +1,18 @@
 import { Hono } from "hono";
+import puppeteer, { BrowserWorker } from "@cloudflare/puppeteer";
 import { renderer } from "./renderer";
 import LandingPage from "./pages/landing";
 import TextBackground from "./pages/text-background";
 import { validateRoute } from "./utils/text-background-validation";
 import validateScreenshot from "./utils/screenshot-validator";
 import {
-  buildScreenshotHtml,
+  buildTextBackgroundUrl,
   createBrowserRenderingRequest,
   getBrowserRenderingConfig,
 } from "./utils/browser-rendering";
 
 type Bindings = {
+  MYBROWSER: BrowserWorker;
   CLOUDFLARE_ACCOUNT_ID: string;
   CLOUDFLARE_BROWSER_RENDERING_API_TOKEN: string;
 };
@@ -62,15 +64,70 @@ app.get("/screenshot", async (c) => {
         cutOffTextToggle: string;
       },
     );
+  const origin = new URL(c.req.url).origin;
+  const targetUrl = buildTextBackgroundUrl({
+    origin,
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
+  });
+
+  try {
+    const browser = await puppeteer.launch(c.env.MYBROWSER, {
+      keep_alive: 600000,
+    });
+    try {
+      const page = await browser.newPage();
+      await page.setViewport({ width, height });
+      await page.goto(targetUrl, { waitUntil: "networkidle2" });
+      const screenshot = await page.screenshot({ type: "png" });
+
+      return new Response(screenshot, {
+        headers: {
+          "Content-Type": "image/png",
+        },
+      });
+    } finally {
+      await browser.close();
+    }
+  } catch (error) {
+    return c.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unexpected screenshot generation error.",
+      },
+      500,
+    );
+  }
+});
+
+app.get("/screenshot-rest-url", async (c) => {
+  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
+    validateScreenshot(
+      c.req.query() as {
+        width: string;
+        height: string;
+        displayText: string;
+        randomTextToggle: string;
+        cutOffTextToggle: string;
+      },
+    );
+  const origin = new URL(c.req.url).origin;
+  const targetUrl = buildTextBackgroundUrl({
+    origin,
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
+  });
+
   try {
     const { accountId, apiToken } = getBrowserRenderingConfig(c.env);
-    const screenshotHtml = buildScreenshotHtml({
-      width,
-      height,
-      displayText,
-      randomTextToggle,
-      cutOffTextToggle,
-    });
 
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/screenshot`,
@@ -84,7 +141,7 @@ app.get("/screenshot", async (c) => {
           createBrowserRenderingRequest({
             width,
             height,
-            html: screenshotHtml,
+            url: targetUrl,
           }),
         ),
       },
