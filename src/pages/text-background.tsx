@@ -157,7 +157,9 @@ const TextBackground = ({
           charCount: Math.round(remainingCharacters / 2 / cpl) * cpl,
         })
       : getRandomText({
-          charCount: remainingCharacters / 2,
+          charCount:
+            Math.round(remainingCharacters / 2 / cpl) * cpl +
+            Math.floor((cpl - displayTextElements.length) / 2),
         });
   // bottom half of random text
   const bottomHalfRandomTextElements = getRandomText({
