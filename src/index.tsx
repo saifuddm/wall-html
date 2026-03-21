@@ -1,19 +1,17 @@
 import { Hono } from "hono";
+import puppeteer from "@cloudflare/puppeteer";
 import { renderer } from "./renderer";
-import puppeteer, { BrowserWorker } from "@cloudflare/puppeteer";
 import LandingPage from "./pages/landing";
 import TextBackground from "./pages/text-background";
-import {
-  calculateCpl,
-  calculateLpp,
-  validateRoute,
-} from "./utils/text-background-validation";
+import { validateRoute } from "./utils/text-background-validation";
 import validateScreenshot from "./utils/screenshot-validator";
+import {
+  buildTextBackgroundUrl,
+  createBrowserRenderingRequest,
+  getBrowserRenderingConfig,
+} from "./utils/browser-rendering";
 
-type Bindings = {
-  MYBROWSER: BrowserWorker;
-};
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.use(renderer);
 
@@ -61,31 +59,124 @@ app.get("/screenshot", async (c) => {
         cutOffTextToggle: string;
       },
     );
-  // Build URL
   const origin = new URL(c.req.url).origin;
-  const browser = await puppeteer.launch(c.env.MYBROWSER, {
-    keep_alive: 600000,
+  const targetUrl = buildTextBackgroundUrl({
+    origin,
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
   });
-  const page = await browser.newPage();
-  await page.setViewport({ width, height });
 
-  // Target URL with query parameters
-  const target = new URL("/text-background", origin);
-  target.searchParams.set("width", width.toString());
-  target.searchParams.set("height", height.toString());
-  target.searchParams.set("displayText", displayText);
-  target.searchParams.set("randomTextToggle", randomTextToggle.toString());
-  target.searchParams.set("cutOffTextToggle", cutOffTextToggle.toString());
-  console.log(target.toString());
+  try {
+    const browser = await puppeteer.launch(c.env.MYBROWSER, {
+      keep_alive: 600000,
+    });
+    try {
+      const page = await browser.newPage();
+      await page.setViewport({ width, height });
+      await page.goto(targetUrl, { waitUntil: "networkidle2" });
+      const screenshot = await page.screenshot({ type: "png" });
 
-  await page.goto(target.toString(), { waitUntil: "networkidle2" });
-  const screenshot = await page.screenshot({ type: "png" });
-  await browser.close();
-  return new Response(screenshot, {
-    headers: {
-      "Content-Type": "image/png",
-    },
+      return new Response(screenshot, {
+        headers: {
+          "Content-Type": "image/png",
+        },
+      });
+    } finally {
+      await browser.close();
+    }
+  } catch (error) {
+    return c.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unexpected screenshot generation error.",
+      },
+      500,
+    );
+  }
+});
+
+app.get("/screenshot-rest-url", async (c) => {
+  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
+    validateScreenshot(
+      c.req.query() as {
+        width: string;
+        height: string;
+        displayText: string;
+        randomTextToggle: string;
+        cutOffTextToggle: string;
+      },
+    );
+  const origin = new URL(c.req.url).origin;
+  const targetUrl = buildTextBackgroundUrl({
+    origin,
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
   });
+
+  try {
+    const { accountId, apiToken } = getBrowserRenderingConfig(c.env);
+
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/screenshot`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          createBrowserRenderingRequest({
+            width,
+            height,
+            url: targetUrl,
+          }),
+        ),
+      },
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return c.json(
+        {
+          error: "Cloudflare Browser Rendering screenshot request failed.",
+          status: response.status,
+          details: errorText,
+        },
+        502,
+      );
+    }
+
+    const headers = new Headers({
+      "Content-Type": response.headers.get("Content-Type") ?? "image/png",
+    });
+    const browserMsUsed = response.headers.get("X-Browser-Ms-Used");
+    if (browserMsUsed) {
+      headers.set("X-Browser-Ms-Used", browserMsUsed);
+    }
+
+    return new Response(response.body, {
+      status: response.status,
+      headers,
+    });
+  } catch (error) {
+    return c.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unexpected screenshot generation error.",
+      },
+      500,
+    );
+  }
 });
 
 export default app;
