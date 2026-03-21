@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import puppeteer, { BrowserWorker } from "@cloudflare/puppeteer";
+import puppeteer from "@cloudflare/puppeteer";
 import { renderer } from "./renderer";
 import LandingPage from "./pages/landing";
 import TextBackground from "./pages/text-background";
@@ -11,12 +11,7 @@ import {
   getBrowserRenderingConfig,
 } from "./utils/browser-rendering";
 
-type Bindings = {
-  MYBROWSER: BrowserWorker;
-  CLOUDFLARE_ACCOUNT_ID: string;
-  CLOUDFLARE_BROWSER_RENDERING_API_TOKEN: string;
-};
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono<{ Bindings: CloudflareBindings }>();
 
 app.use(renderer);
 
