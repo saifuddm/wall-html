@@ -99,7 +99,11 @@ const handleDisplayCharacter = ({
       <span class="hidden" aria-hidden="true">
         EmojiSpace
       </span>,
+
       <span class="opacity-100 font-emoji">{char}</span>,
+      <span class="hidden" aria-hidden="true">
+        EmojiSpace
+      </span>,
     ];
   } else if (char === " ") {
     console.log("space found, randomTextToggle", randomTextToggle);
