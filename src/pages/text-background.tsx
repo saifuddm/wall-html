@@ -46,7 +46,12 @@ const getDisplayText = ({
     for (const word of wordMap) {
       let remainingCpl = cpl - displayTextElements.length + lineTracker * cpl;
 
-      if (word.length < remainingCpl) {
+      let wordLength = word.length;
+      if (isEmoji(word)) {
+        wordLength = 3;
+      }
+
+      if (wordLength < remainingCpl) {
         for (const { segment } of segmenter.segment(word)) {
           displayTextElements.push(
             ...handleDisplayCharacter({ char: segment, randomTextToggle }),
@@ -99,8 +104,9 @@ const handleDisplayCharacter = ({
       <span class="hidden" aria-hidden="true">
         EmojiSpace
       </span>,
-
-      <span class="opacity-100 font-emoji">{char}</span>,
+      <div class="w-[3ch] font-display text-center opacity-100">
+        <span class=" font-emoji">{char}</span>
+      </div>,
       <span class="hidden" aria-hidden="true">
         EmojiSpace
       </span>,
