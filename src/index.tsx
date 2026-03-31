@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import puppeteer from "@cloudflare/puppeteer";
 import { renderer } from "./renderer";
 import LandingPage from "./pages/landing";
 import TextBackground from "./pages/text-background";
@@ -46,58 +45,6 @@ app.get("/health", (c) => {
     status: "ok",
     service: "wall-html",
   });
-});
-
-app.get("/screenshot", async (c) => {
-  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
-    validateScreenshot(
-      c.req.query() as {
-        width: string;
-        height: string;
-        displayText: string;
-        randomTextToggle: string;
-        cutOffTextToggle: string;
-      },
-    );
-  const origin = new URL(c.req.url).origin;
-  const targetUrl = buildTextBackgroundUrl({
-    origin,
-    width,
-    height,
-    displayText,
-    randomTextToggle,
-    cutOffTextToggle,
-  });
-
-  try {
-    const browser = await puppeteer.launch(c.env.MYBROWSER, {
-      keep_alive: 600000,
-    });
-    try {
-      const page = await browser.newPage();
-      await page.setViewport({ width, height });
-      await page.goto(targetUrl, { waitUntil: "networkidle2" });
-      const screenshot = await page.screenshot({ type: "png" });
-
-      return new Response(screenshot, {
-        headers: {
-          "Content-Type": "image/png",
-        },
-      });
-    } finally {
-      await browser.close();
-    }
-  } catch (error) {
-    return c.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unexpected screenshot generation error.",
-      },
-      500,
-    );
-  }
 });
 
 app.get("/screenshot-rest-url", async (c) => {

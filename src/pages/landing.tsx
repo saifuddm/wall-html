@@ -1,110 +1,137 @@
 const LandingPage = () => {
   return (
-    <main class="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 sm:px-6 sm:py-16">
-      <div class="mx-auto flex max-w-6xl flex-col gap-8">
-        <section class="rounded-3xl border border-slate-800 bg-slate-900/70 p-6 shadow-2xl shadow-slate-950/30 sm:p-8 space-y-5">
-          <p class="text-sm font-medium uppercase tracking-[0.24em] text-sky-300">
-            Screenshot API
-          </p>
-          <div class="space-y-3">
-            <h1 class="max-w-2xl text-3xl font-semibold tracking-tight sm:text-5xl">
-              Generate image screenshots from simple query parameters
-            </h1>
-            <p class=" text-base leading-7 text-slate-300 sm:text-lg">
-              Use the{" "}
-              <code class="rounded bg-slate-800 px-2 py-1 text-sm text-slate-100">
-                /screenshot
-              </code>{" "}
-              endpoint for the original browser-binding flow, or{" "}
-              <code class="rounded bg-slate-800 px-2 py-1 text-sm text-slate-100">
-                /screenshot-rest-url
-              </code>{" "}
-              for Cloudflare Browser Rendering REST URL mode. Choose the width,
-              height, text, and toggle options below, then open either request
-              in a new tab.
-            </p>
+    <main class="relative min-h-screen bg-surface text-slate-100 overflow-hidden noise-bg grid-bg">
+      {/* Decorative orbs */}
+      <div class="pointer-events-none absolute -top-40 -left-40 h-96 w-96 rounded-full bg-lime-glow opacity-[0.4] blur-[120px]" />
+      <div class="pointer-events-none absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-cyan-400 opacity-[0.3] blur-[120px]" />
+
+      <div class="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
+        {/* ─── Hero ─── */}
+        <section class="animate-slide-up space-y-6">
+          <div class="flex items-center gap-3">
+            <span class="inline-block rounded-full border border-border bg-card px-3 py-1 font-mono text-xs tracking-widest text-lime-glow uppercase">
+              wall-html
+            </span>
           </div>
+
+          <h1 class="font-display text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
+            <span class="block">Text walls</span>
+            <span class="block bg-linear-to-r from-lime-glow to-emerald-400 bg-clip-text text-transparent animate-gradient">
+              as images
+            </span>
+          </h1>
+
+          <p class="max-w-xl font-mono text-sm leading-7 text-slate-400 sm:text-base">
+            Turn any text into a bold, typographic screenshot. Set dimensions,
+            tweak spacing, hit the button — get a PNG back instantly.
+          </p>
         </section>
 
-        <section class="grid gap-6 lg:grid-cols-2">
-          <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 space-y-6">
+        <div class="grid gap-6 lg:grid-cols-5">
+          {/* ─── How it works ─── */}
+          <div class="animate-slide-up-2 lg:col-span-2 space-y-4">
+            <h2 class="font-display text-lg font-bold tracking-tight text-slate-300 uppercase">
+              How it works
+            </h2>
             <div class="space-y-2">
-              <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-                How to use the API
-              </h2>
-              <p class="text-sm leading-7 text-slate-300 sm:text-base">
-                Build a GET request to the screenshot endpoint with the query
-                parameters below. Both services render the background page at
-                your chosen dimensions and return a PNG so you can compare the
-                results side by side.
-              </p>
+              {[
+                {
+                  n: "01",
+                  title: "Set dimensions",
+                  desc: "1080×1920 for stories, 1200×630 for social cards — your call.",
+                },
+                {
+                  n: "02",
+                  title: "Drop in your text",
+                  desc: "It becomes the giant typographic content filling the frame.",
+                },
+                {
+                  n: "03",
+                  title: "Toggle the vibes",
+                  desc: "Randomize letter spacing, allow cut-off text for that raw, graphic look.",
+                },
+                {
+                  n: "04",
+                  title: "Get your PNG",
+                  desc: "The API renders it in a real browser and hands you a screenshot.",
+                },
+              ].map((step) => (
+                <div class="step-card group flex gap-4 rounded-2xl border border-border bg-card p-4">
+                  <span class="font-display text-2xl font-black text-lime-glow opacity-40 group-hover:opacity-100 transition-opacity">
+                    {step.n}
+                  </span>
+                  <div>
+                    <p class="font-mono text-sm font-bold text-slate-200">
+                      {step.title}
+                    </p>
+                    <p class="mt-1 text-xs leading-5 text-slate-500">
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <ol class="space-y-4">
-              <li class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                <p class="text-sm font-semibold text-slate-100">
-                  1. Pick the image dimensions
-                </p>
-                <p class="mt-2 text-sm leading-6 text-slate-300">
-                  Use width and height values that match your target format,
-                  such as 1080x1920 for stories or 1200x630 for social cards.
-                </p>
-              </li>
-              <li class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                <p class="text-sm font-semibold text-slate-100">
-                  2. Provide the display text
-                </p>
-                <p class="mt-2 text-sm leading-6 text-slate-300">
-                  The text becomes the content rendered into the background
-                  before the screenshot is taken.
-                </p>
-              </li>
-              <li class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                <p class="text-sm font-semibold text-slate-100">
-                  3. Choose the toggle behavior
-                </p>
-                <p class="mt-2 text-sm leading-6 text-slate-300">
-                  Select whether to randomize the text layout and whether the
-                  text can be cut off for a more graphic look.
-                </p>
-              </li>
-              <li class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                <p class="text-sm font-semibold text-slate-100">
-                  4. Open either screenshot flow
-                </p>
-                <p class="mt-2 text-sm leading-6 text-slate-300">
-                  Use the original browser-binding route or the new REST URL
-                  route to compare output and performance in parallel.
-                </p>
-              </li>
-            </ol>
+            {/* ─── Endpoints reference ─── */}
+            <div class="mt-2 space-y-2 rounded-2xl border border-border bg-card p-4">
+              <h3 class="font-display text-xs font-bold tracking-widest text-slate-500 uppercase">
+                Endpoints
+              </h3>
+              <div class="space-y-2 font-mono text-xs">
+                <div class="rounded-xl bg-surface p-3 border border-border">
+                  <div class="flex items-center gap-2">
+                    <span class="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
+                      GET
+                    </span>
+                    <span class="text-slate-300">/screenshot-rest-url</span>
+                  </div>
+                  <p class="mt-1.5 text-[11px] leading-4 text-slate-500">
+                    Renders via Cloudflare Browser Rendering REST API. Returns a
+                    PNG screenshot of the text wall.
+                  </p>
+                </div>
+                <div class="rounded-xl bg-surface p-3 border border-border">
+                  <div class="flex items-center gap-2">
+                    <span class="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
+                      GET
+                    </span>
+                    <span class="text-slate-300">/text-background</span>
+                  </div>
+                  <p class="mt-1.5 text-[11px] leading-4 text-slate-500">
+                    Returns the raw HTML page with the typographic text wall —
+                    no screenshot, just the rendered page.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <section class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
+          {/* ─── Builder form ─── */}
+          <section class="animate-slide-up-3 lg:col-span-3 rounded-3xl border border-border bg-card p-6 sm:p-8">
             <div class="space-y-6">
-              <div class="space-y-2">
-                <h2 class="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Build a screenshot request
+              <div class="space-y-1">
+                <h2 class="font-display text-2xl font-black tracking-tight sm:text-3xl">
+                  Build a request
                 </h2>
-                <p class="text-sm leading-7 text-slate-300 sm:text-base">
-                  Enter the query values you want to send. Each button opens a
-                  different screenshot flow in a new browser tab.
+                <p class="font-mono text-xs text-slate-500">
+                  configure → generate → download your png
                 </p>
               </div>
 
               <form
-                action="/screenshot"
+                action="/screenshot-rest-url"
                 class="space-y-5"
                 method="get"
                 target="_blank"
               >
+                {/* Dimensions */}
                 <div class="grid gap-4 sm:grid-cols-2">
-                  <label class="space-y-2">
-                    <span class="text-sm font-medium text-slate-200">
+                  <label class="space-y-1.5">
+                    <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                       Width
                     </span>
                     <input
-                      class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400"
+                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
                       min="1"
                       name="width"
                       placeholder="1080"
@@ -113,13 +140,12 @@ const LandingPage = () => {
                       value="1080"
                     />
                   </label>
-
-                  <label class="space-y-2">
-                    <span class="text-sm font-medium text-slate-200">
+                  <label class="space-y-1.5">
+                    <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                       Height
                     </span>
                     <input
-                      class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400"
+                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
                       min="1"
                       name="height"
                       placeholder="1920"
@@ -130,95 +156,113 @@ const LandingPage = () => {
                   </label>
                 </div>
 
-                <label class="block space-y-2">
-                  <span class="text-sm font-medium text-slate-200">
+                {/* Display text */}
+                <label class="block space-y-1.5">
+                  <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                     Display text
                   </span>
                   <input
-                    class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-sky-400"
+                    class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
                     name="displayText"
-                    placeholder="Launch campaign creative"
+                    placeholder="your text goes here..."
                     required
                     type="text"
                     value="This is a test of the text background generator"
                   />
                 </label>
 
-                <fieldset class="space-y-3">
-                  <legend class="text-sm font-medium text-slate-200">
-                    Random text spacing
-                  </legend>
-                  <div class="grid gap-3 sm:grid-cols-2">
-                    <label class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-slate-200">
-                      <input
-                        checked
-                        name="randomTextToggle"
-                        type="radio"
-                        value="true"
-                      />
-                      Enable spacing with random characters
-                    </label>
-                    <label class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-slate-200">
-                      <input
-                        name="randomTextToggle"
-                        type="radio"
-                        value="false"
-                      />
-                      Keep normal spacing
-                    </label>
-                  </div>
-                </fieldset>
+                {/* Toggles */}
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <fieldset class="space-y-2">
+                    <legend class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                      Random spacing
+                    </legend>
+                    <div class="space-y-2">
+                      <label class="step-card flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs text-slate-300 cursor-pointer">
+                        <input
+                          checked
+                          class="accent-lime-glow"
+                          name="randomTextToggle"
+                          type="radio"
+                          value="true"
+                        />
+                        <span>Fill gaps with random chars</span>
+                      </label>
+                      <label class="step-card flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs text-slate-300 cursor-pointer">
+                        <input
+                          class="accent-lime-glow"
+                          name="randomTextToggle"
+                          type="radio"
+                          value="false"
+                        />
+                        <span>Keep normal spacing</span>
+                      </label>
+                    </div>
+                  </fieldset>
 
-                <fieldset class="space-y-3">
-                  <legend class="text-sm font-medium text-slate-200">
-                    Allow cut off text
-                  </legend>
-                  <div class="grid gap-3 sm:grid-cols-2">
-                    <label class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-slate-200">
-                      <input
-                        checked
-                        name="cutOffTextToggle"
-                        type="radio"
-                        value="true"
-                      />
-                      Yes, allow cut off
-                    </label>
-                    <label class="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-slate-200">
-                      <input
-                        name="cutOffTextToggle"
-                        type="radio"
-                        value="false"
-                      />
-                      No, keep it contained
-                    </label>
-                  </div>
-                </fieldset>
+                  <fieldset class="space-y-2">
+                    <legend class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                      Cut-off text
+                    </legend>
+                    <div class="space-y-2">
+                      <label class="step-card flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs text-slate-300 cursor-pointer">
+                        <input
+                          checked
+                          class="accent-lime-glow"
+                          name="cutOffTextToggle"
+                          type="radio"
+                          value="true"
+                        />
+                        <span>Allow cut-off edges</span>
+                      </label>
+                      <label class="step-card flex items-center gap-3 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs text-slate-300 cursor-pointer">
+                        <input
+                          class="accent-lime-glow"
+                          name="cutOffTextToggle"
+                          type="radio"
+                          value="false"
+                        />
+                        <span>Keep contained</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
 
-                <div class="flex flex-col gap-3 border-t border-slate-800 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                  <p class="text-sm leading-6 text-slate-400">
-                    Open the original browser-binding route or the new REST URL
-                    route to compare generated PNGs directly.
+                {/* Submit */}
+                <div class="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  <p class="font-mono text-[11px] leading-5 text-slate-600">
+                    Opens in a new tab as a PNG image.
                   </p>
                   <div class="flex flex-col gap-3 sm:flex-row">
                     <button
-                      class="inline-flex items-center justify-center rounded-full bg-sky-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-300"
+                      class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-sm font-bold text-surface tracking-wide cursor-pointer"
                       type="submit"
                     >
-                      Open /screenshot
+                      <span>Generate screenshot</span>
+                      <span class="text-base">→</span>
                     </button>
                     <button
-                      class="inline-flex items-center justify-center rounded-full border border-sky-400 px-5 py-3 text-sm font-semibold text-sky-300 transition hover:border-sky-300 hover:text-sky-200"
-                      formAction="/screenshot-rest-url"
+                      class="btn-outline inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 font-mono text-xs text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 cursor-pointer"
+                      formAction="/text-background"
                       type="submit"
                     >
-                      Open /screenshot-rest-url
+                      Preview HTML
                     </button>
                   </div>
                 </div>
               </form>
             </div>
           </section>
-        </section>
+        </div>
+
+        {/* ─── Footer ─── */}
+        <footer class="animate-slide-up-4 flex items-center justify-between border-t border-border pt-6 font-mono text-[11px] text-slate-600">
+          <span>built on cloudflare workers</span>
+          <span class="flex items-center gap-1.5">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-glow" />
+            api online
+          </span>
+        </footer>
       </div>
     </main>
   );

@@ -32,3 +32,10 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# ai
+.agents
+.claude
+.skills-lock.json
+AGENTS.md
+CLAUDE.md
