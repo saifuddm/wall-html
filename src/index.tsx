@@ -9,8 +9,18 @@ import {
   createBrowserRenderingRequest,
   getBrowserRenderingConfig,
 } from "./utils/browser-rendering";
+import logger from "./utils/logger";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
+
+app.use(async (c, next) => {
+  const start = Date.now();
+  await next();
+  logger.info(
+    { method: c.req.method, path: c.req.path, status: c.res.status, duration: Date.now() - start },
+    "request",
+  );
+});
 
 app.use(renderer);
 
@@ -20,15 +30,7 @@ app.get("/", (c) => {
 
 app.get("/text-background", (c) => {
   const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
-    validateRoute(
-      c.req.query() as {
-        width: string;
-        height: string;
-        displayText: string;
-        randomTextToggle: string;
-        cutOffTextToggle: string;
-      },
-    );
+    validateRoute(c.req.query());
   return c.render(
     <TextBackground
       width={width}
@@ -49,15 +51,7 @@ app.get("/health", (c) => {
 
 app.get("/screenshot-rest-url", async (c) => {
   const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
-    validateScreenshot(
-      c.req.query() as {
-        width: string;
-        height: string;
-        displayText: string;
-        randomTextToggle: string;
-        cutOffTextToggle: string;
-      },
-    );
+    validateScreenshot(c.req.query());
   const origin = new URL(c.req.url).origin;
   const targetUrl = buildTextBackgroundUrl({
     origin,
@@ -101,8 +95,16 @@ app.get("/screenshot-rest-url", async (c) => {
       );
     }
 
+    const etag = `"${await crypto.subtle.digest("SHA-256", new TextEncoder().encode(targetUrl)).then((buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("")).then((hex) => hex.slice(0, 32))}"`;
+
+    if (c.req.header("If-None-Match") === etag) {
+      return new Response(null, { status: 304, headers: { ETag: etag } });
+    }
+
     const headers = new Headers({
       "Content-Type": response.headers.get("Content-Type") ?? "image/png",
+      "Cache-Control": "public, max-age=86400, s-maxage=604800, immutable",
+      ETag: etag,
     });
     const browserMsUsed = response.headers.get("X-Browser-Ms-Used");
     if (browserMsUsed) {

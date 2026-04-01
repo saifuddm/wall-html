@@ -1,27 +1,24 @@
+import logger from "./logger";
+
+const DEFAULT_SIZE = 1000;
+const DEFAULT_TEXT = "This is a test of the text background generator 🪨";
+
 // Validators
-const parseInteger = (key: string, value: string) => {
+const parseInteger = (value?: string, fallback = DEFAULT_SIZE) => {
+  if (value === undefined) return fallback;
   const n = parseInt(value);
-  if (Number.isNaN(n)) {
-    throw new Error(`Invalid integer: ${key}: ${value}`);
-  }
-  return n as number;
+  return Number.isNaN(n) ? fallback : n;
 };
 
-const parseBoolean = (key: string, value: string) => {
-  if (value === "true") {
-    return true;
-  }
-  if (value === "false") {
-    return false;
-  }
-  throw new Error(`Invalid boolean: ${key}: ${value}`);
+const parseBoolean = (value?: string, fallback = true) => {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return fallback;
 };
 
-const parseString = (key: string, value: string) => {
-  if (value.length === 0) {
-    throw new Error(`Invalid string: ${key}: ${value}`);
-  }
-  return value as string;
+const parseString = (value?: string, fallback = DEFAULT_TEXT) => {
+  if (value === undefined || value.length === 0) return fallback;
+  return value;
 };
 
 const validateRoute = ({
@@ -31,23 +28,17 @@ const validateRoute = ({
   randomTextToggle,
   cutOffTextToggle,
 }: {
-  width: string;
-  height: string;
-  displayText: string;
-  randomTextToggle: string;
-  cutOffTextToggle: string;
+  width?: string;
+  height?: string;
+  displayText?: string;
+  randomTextToggle?: string;
+  cutOffTextToggle?: string;
 }) => {
-  const parsedWidth = parseInteger("width", width);
-  const parsedHeight = parseInteger("height", height);
-  const parsedDisplayText = parseString("displayText", displayText);
-  const parsedRandomTextToggle =
-    randomTextToggle === undefined
-      ? true
-      : parseBoolean("randomTextToggle", randomTextToggle);
-  const parsedCutOffTextToggle =
-    randomTextToggle === undefined
-      ? true
-      : parseBoolean("cutOffTextToggle", cutOffTextToggle);
+  const parsedWidth = parseInteger(width);
+  const parsedHeight = parseInteger(height);
+  const parsedDisplayText = parseString(displayText);
+  const parsedRandomTextToggle = parseBoolean(randomTextToggle);
+  const parsedCutOffTextToggle = parseBoolean(cutOffTextToggle);
   return {
     width: parsedWidth,
     height: parsedHeight,
@@ -66,14 +57,22 @@ const avgGlyphWidth = fontSizePx * 0.6;
 
 const calculateCpl = (width: number) => {
   const cpl = Math.floor((width - paddingX) / avgGlyphWidth);
-  console.log(`cpl: ${cpl}`);
+  logger.info({ width, cpl }, "calculated cpl");
   return cpl;
 };
 
 const calculateLpp = (height: number) => {
   const lpp = Math.floor(height / fontSizePx);
-  console.log(`lpp: ${lpp}`);
+  logger.info({ height, lpp }, "calculated lpp");
   return lpp;
 };
 
-export { validateRoute, calculateCpl, calculateLpp, isEmoji };
+export {
+  parseInteger,
+  parseBoolean,
+  parseString,
+  validateRoute,
+  calculateCpl,
+  calculateLpp,
+  isEmoji,
+};

@@ -1,30 +1,21 @@
-const parseInteger = (value?: string) => {
-  if (value === undefined) {
-    return 1000 as number;
-  }
-  try {
-    const n = parseInt(value);
-    if (Number.isNaN(n)) {
-      return 1000 as number;
-    }
-    return n as number;
-  } catch (error) {
-    return 1000 as number;
-  }
+const DEFAULT_SIZE = 1000;
+const DEFAULT_TEXT = "This is a test of the text background generator 🪨";
+
+const parseInteger = (value?: string, fallback = DEFAULT_SIZE) => {
+  if (value === undefined) return fallback;
+  const n = parseInt(value);
+  return Number.isNaN(n) ? fallback : n;
 };
 
-const parseString = (value?: string) => {
-  if (value === undefined || value.length === 0) {
-    return "This is a test of the text background generator 🪨";
-  }
-  return value as string;
+const parseString = (value?: string, fallback = DEFAULT_TEXT) => {
+  if (value === undefined || value.length === 0) return fallback;
+  return value;
 };
 
-const parseBoolean = (value?: string) => {
-  if (value === "true") {
-    return true;
-  }
-  return false;
+const parseBoolean = (value?: string, fallback = true) => {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return fallback;
 };
 
 const validateScreenshot = ({

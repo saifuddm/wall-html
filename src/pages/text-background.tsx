@@ -4,6 +4,7 @@ import {
   calculateLpp,
   isEmoji,
 } from "../utils/text-background-validation";
+import logger from "../utils/logger";
 
 type TextBackgroundProps = {
   width: number;
@@ -58,10 +59,7 @@ const getDisplayText = ({
           );
         }
       } else {
-        console.log(
-          "cannot fit word in remaining space, padding with random text",
-          remainingCpl,
-        );
+        logger.debug({ word, remainingCpl }, "padding with random text, word does not fit");
         // cannot fit word in remaining space, pad with random text
         for (let i = 0; i < remainingCpl; i++) {
           displayTextElements.push(
@@ -97,7 +95,7 @@ const handleDisplayCharacter = ({
   randomTextToggle: boolean;
 }) => {
   if (isEmoji(char)) {
-    console.log("emoji found", char);
+    logger.debug({ char }, "emoji found");
     // subtract 1 space extra for emoji by adding a none display character
 
     return [
@@ -112,7 +110,6 @@ const handleDisplayCharacter = ({
       </span>,
     ];
   } else if (char === " ") {
-    console.log("space found, randomTextToggle", randomTextToggle);
     if (randomTextToggle) {
       return [
         <span class="opacity-25 font-display uppercase">
@@ -133,7 +130,7 @@ const mapWordsToCharacters = ({ displayText }: { displayText: string }) => {
     tokenSegments.push(segment);
   }
 
-  console.log(tokenSegments);
+  logger.debug({ words: tokenSegments }, "word map");
   return tokenSegments;
 };
 
@@ -158,7 +155,7 @@ const TextBackground = ({
   const remainingCharacters =
     totalNumberOfCharacters - displayTextElements.length;
 
-  console.log("display char", displayTextElements.length < cpl);
+  logger.info({ cpl, lpp, totalChars: totalNumberOfCharacters, displayChars: displayTextElements.length }, "rendering text background");
 
   // top half of random text
   const topHalfRandomTextElements =
@@ -189,3 +186,4 @@ const TextBackground = ({
 };
 
 export default TextBackground;
+export { getRandomText, getDisplayText, handleDisplayCharacter, mapWordsToCharacters };

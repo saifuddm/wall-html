@@ -6,10 +6,13 @@
     "build": "vite build",
     "preview": "$npm_execpath run build && vite preview",
     "deploy": "$npm_execpath run build && wrangler deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "hono": "^4.12.8"
+    "hono": "^4.12.8",
+    "pino": "^10.3.1"
   },
   "devDependencies": {
     "@cloudflare/puppeteer": "^1.0.6",
@@ -19,6 +22,7 @@
     "tailwindcss": "^4.2.1",
     "vite": "^6.3.5",
     "vite-ssr-components": "^0.5.2",
+    "vitest": "^4.1.2",
     "wrangler": "^4.17.0"
   }
 }
