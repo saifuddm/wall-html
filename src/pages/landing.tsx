@@ -114,7 +114,7 @@ const LandingPage = () => {
                   Build a request
                 </h2>
                 <p class="font-mono text-xs text-slate-500">
-                  configure → generate → download your png
+                  configure → preview → generate your png
                 </p>
               </div>
 
@@ -231,24 +231,16 @@ const LandingPage = () => {
                 {/* Submit */}
                 <div class="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
                   <p class="font-mono text-[11px] leading-5 text-slate-600">
-                    Opens in a new tab as a PNG image.
+                    Preview first, then generate your screenshot.
                   </p>
-                  <div class="flex flex-col gap-3 sm:flex-row">
-                    <button
-                      class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-sm font-bold text-surface tracking-wide cursor-pointer"
-                      type="submit"
-                    >
-                      <span>Generate screenshot</span>
-                      <span class="text-base">→</span>
-                    </button>
-                    <button
-                      class="btn-outline inline-flex items-center justify-center gap-2 rounded-full border border-border px-5 py-3 font-mono text-xs text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 cursor-pointer"
-                      formAction="/text-background"
-                      type="submit"
-                    >
-                      Preview HTML
-                    </button>
-                  </div>
+                  <button
+                    class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-sm font-bold text-surface tracking-wide cursor-pointer"
+                    id="preview-btn"
+                    type="button"
+                  >
+                    <span>Preview</span>
+                    <span class="text-base">→</span>
+                  </button>
                 </div>
               </form>
             </div>
@@ -264,6 +256,123 @@ const LandingPage = () => {
           </span>
         </footer>
       </div>
+
+      {/* ─── Preview modal ─── */}
+      <div
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm"
+        id="preview-overlay"
+      >
+        <div class="rounded-3xl border border-border bg-card shadow-2xl overflow-hidden max-w-[90vw] max-h-[90vh] flex flex-col">
+          <div class="flex items-center justify-between border-b border-border px-5 py-3">
+            <span class="font-mono text-sm font-bold text-slate-400">
+              Preview
+            </span>
+            <button
+              class="rounded-full p-1.5 text-slate-500 hover:text-lime-glow hover:bg-surface transition-colors cursor-pointer text-lg leading-none"
+              id="preview-close"
+              type="button"
+            >
+              &times;
+            </button>
+          </div>
+          <div class="overflow-hidden" id="preview-wrapper">
+            <iframe class="border-none block" id="preview-iframe" />
+          </div>
+          <div class="flex items-center justify-between gap-3 border-t border-border px-5 py-3">
+            <span
+              class="rounded-full bg-surface px-3 py-1 font-mono text-xs text-slate-500"
+              id="preview-dimensions"
+            />
+            <div class="flex items-center gap-2">
+              <a
+                class="btn-outline inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-mono text-[11px] text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 no-underline"
+                id="preview-open-tab"
+                href="#"
+                target="_blank"
+              >
+                Open in tab
+              </a>
+              <a
+                class="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-mono text-[11px] font-bold text-surface no-underline cursor-pointer"
+                id="preview-screenshot"
+                href="#"
+                target="_blank"
+              >
+                Generate Screenshot
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+(function() {
+  var overlay = document.getElementById('preview-overlay');
+  var iframe = document.getElementById('preview-iframe');
+  var wrapper = document.getElementById('preview-wrapper');
+  var previewBtn = document.getElementById('preview-btn');
+  var closeBtn = document.getElementById('preview-close');
+  var dimLabel = document.getElementById('preview-dimensions');
+  var openTab = document.getElementById('preview-open-tab');
+  var screenshotBtn = document.getElementById('preview-screenshot');
+
+  if (!overlay || !iframe || !wrapper || !previewBtn) return;
+
+  var MAX_W = 600;
+  var MAX_H = 500;
+
+  previewBtn.addEventListener('click', function(e) {
+    var form = previewBtn.closest('form');
+    var formData = new FormData(form);
+    var params = new URLSearchParams(formData).toString();
+    var previewUrl = '/text-background?' + params;
+    var screenshotUrl = '/screenshot-rest-url?' + params;
+
+    var w = parseInt(formData.get('width')) || 1080;
+    var h = parseInt(formData.get('height')) || 1920;
+
+    var scaleX = MAX_W / w;
+    var scaleY = MAX_H / h;
+    var scale = Math.min(scaleX, scaleY, 1);
+
+    iframe.style.width = w + 'px';
+    iframe.style.height = h + 'px';
+    iframe.style.transform = 'scale(' + scale + ')';
+    iframe.style.transformOrigin = 'top left';
+
+    wrapper.style.width = Math.round(w * scale) + 'px';
+    wrapper.style.height = Math.round(h * scale) + 'px';
+
+    dimLabel.textContent = w + ' \\u00d7 ' + h + ' (scaled ' + Math.round(scale * 100) + '%)';
+    openTab.href = previewUrl;
+    screenshotBtn.href = screenshotUrl;
+
+    iframe.src = previewUrl;
+    overlay.classList.remove('hidden');
+    overlay.classList.add('flex');
+  });
+
+  function closeModal() {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('flex');
+    iframe.src = 'about:blank';
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+      `,
+        }}
+      />
     </main>
   );
 };

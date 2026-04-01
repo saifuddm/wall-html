@@ -11,8 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "hono": "^4.12.8",
-    "pino": "^10.3.1"
+    "hono": "^4.12.8"
   },
   "devDependencies": {
     "@cloudflare/puppeteer": "^1.0.6",

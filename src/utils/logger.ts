@@ -1,7 +1,16 @@
-import pino from "pino";
-
-const logger = pino({
-  level: "info",
-});
+const logger = {
+  info: (obj: Record<string, unknown>, msg?: string) => {
+    console.log(JSON.stringify({ level: "info", msg, ...obj }));
+  },
+  error: (obj: Record<string, unknown>, msg?: string) => {
+    console.error(JSON.stringify({ level: "error", msg, ...obj }));
+  },
+  warn: (obj: Record<string, unknown>, msg?: string) => {
+    console.warn(JSON.stringify({ level: "warn", msg, ...obj }));
+  },
+  debug: (obj: Record<string, unknown>, msg?: string) => {
+    console.debug(JSON.stringify({ level: "debug", msg, ...obj }));
+  },
+};
 
 export default logger;
