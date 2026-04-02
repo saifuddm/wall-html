@@ -62,12 +62,19 @@ export const renderer = jsxRenderer(({ children }, c) => {
                 "price": "0",
                 "priceCurrency": "USD",
               },
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "50",
+                "bestRating": "5",
+                "worstRating": "1",
+              },
             }),
           }}
         />
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
-        <script src="https://unpkg.com/lucide@latest" defer />
+        <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js" defer />
       </head>
       <body class="bg-surface">{children}</body>
     </html>

@@ -4,5 +4,9 @@ import { defineConfig } from 'vite'
 import ssrPlugin from 'vite-ssr-components/plugin'
 
 export default defineConfig({
-  plugins: [cloudflare(), tailwindcss(), ssrPlugin()]
+  plugins: [cloudflare(), tailwindcss(), ssrPlugin()],
+  build: {
+    minify: 'esbuild',
+    cssMinify: true,
+  },
 })

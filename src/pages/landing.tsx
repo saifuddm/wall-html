@@ -7,7 +7,7 @@ const LandingPage = () => {
 
       <div class="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
         {/* ─── Hero ─── */}
-        <section class="animate-slide-up space-y-6">
+        <section class="lcp-visible space-y-6">
           <div class="flex items-center gap-3">
             <span class="inline-block rounded-full border border-border bg-card px-3 py-1 font-mono text-xs tracking-widest text-lime-glow uppercase">
               wall-html
@@ -343,11 +343,16 @@ const LandingPage = () => {
           __html: `
 (function() {
   // Initialize Lucide icons
-  if (window.lucide) lucide.createIcons();
-  else document.addEventListener('DOMContentLoaded', function() {
-    var check = setInterval(function() { if (window.lucide) { lucide.createIcons(); clearInterval(check); } }, 50);
+  function initLucide() {
+    if (window.lucide) { lucide.createIcons(); return; }
+    var check = setInterval(function() { if (window.lucide) { lucide.createIcons(); clearInterval(check); } }, 100);
     setTimeout(function() { clearInterval(check); }, 3000);
-  });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLucide);
+  } else {
+    requestAnimationFrame(initLucide);
+  }
 
   // Preset size buttons
   var presetBtns = document.querySelectorAll('.preset-btn');
@@ -376,7 +381,7 @@ const LandingPage = () => {
 
   widthInput.addEventListener('input', syncPresetHighlight);
   heightInput.addEventListener('input', syncPresetHighlight);
-  syncPresetHighlight();
+  requestAnimationFrame(syncPresetHighlight);
 
   var overlay = document.getElementById('preview-overlay');
   var iframe = document.getElementById('preview-iframe');
