@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="clip_path_1">
+      <rect width="32" height="32" rx="8" />
+    </clipPath>
+    <filter color-interpolation-filters="sRGB" x="-18" y="-18" width="20" height="20" id="filter_2">
+      <feFlood flood-opacity="0" result="BackgroundImageFix_1" />
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix_1" result="Shape_2" />
+      <feGaussianBlur stdDeviation="7" />
+    </filter>
+    <filter color-interpolation-filters="sRGB" x="-18" y="-18" width="20" height="20" id="filter_3">
+      <feFlood flood-opacity="0" result="BackgroundImageFix_1" />
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix_1" result="Shape_2" />
+      <feGaussianBlur stdDeviation="7" />
+    </filter>
+  </defs>
+  <g clip-path="url(#clip_path_1)">
+    <g>
+      <rect width="32" height="32" fill="#0C0F1A" fill-rule="evenodd" />
+      <line x1="0" y1="0" x2="0" y2="32" fill="none" stroke-width="1" stroke="#BDBDBD" stroke-linecap="square" transform="translate(8 0)" />
+      <line x1="0" y1="0" x2="0" y2="32" fill="none" stroke-width="1" stroke="#BDBDBD" stroke-linecap="square" transform="translate(16 0)" />
+      <line x1="0" y1="0" x2="0" y2="32" fill="none" stroke-width="1" stroke="#BDBDBD" stroke-linecap="square" transform="translate(24 0)" />
+    </g>
+    <path d="M0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10Z" fill="#B5FF2B" fill-rule="evenodd" filter="url(#filter_2)" transform="translate(-8 -8)" />
+    <path d="M0 10C0 4.47715 4.47715 0 10 0C15.5228 0 20 4.47715 20 10C20 15.5228 15.5228 20 10 20C4.47715 20 0 15.5228 0 10Z" fill="#00D3F2" fill-rule="evenodd" filter="url(#filter_3)" transform="translate(22 22)" />
+  </g>
+</svg>

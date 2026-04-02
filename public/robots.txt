@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /screenshot-rest-url
+Disallow: /text-background
+
+Sitemap: https://wall.saifuddm.work/sitemap.xml

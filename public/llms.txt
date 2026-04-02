@@ -1,0 +1,32 @@
+# Wall HTML
+
+> Turn any text into bold typographic screenshots via a simple API.
+
+Wall HTML is a text-to-image screenshot API built on Cloudflare Workers. It renders text as a large typographic wall and returns a PNG screenshot.
+
+## API Endpoints
+
+### GET /screenshot-rest-url
+
+Returns a PNG screenshot of the rendered text wall.
+
+Parameters:
+- `width` (required): Image width in pixels (e.g. 1080)
+- `height` (required): Image height in pixels (e.g. 1920)
+- `displayText` (required): The text to render
+- `randomTextToggle` (optional): `true` to fill gaps with random characters, `false` for normal spacing
+- `cutOffTextToggle` (optional): `true` to allow text to overflow edges, `false` to keep contained
+
+Example: `GET /screenshot-rest-url?width=1080&height=1920&displayText=Hello+World&randomTextToggle=true&cutOffTextToggle=false`
+
+Returns: `image/png`
+
+### GET /text-background
+
+Returns the raw HTML page with the typographic text wall (no screenshot).
+
+Same parameters as `/screenshot-rest-url`.
+
+### GET /health
+
+Returns JSON health check status.
