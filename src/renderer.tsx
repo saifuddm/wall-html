@@ -45,36 +45,43 @@ export const renderer = jsxRenderer(({ children }, c) => {
           content="Turn any text into bold typographic screenshots. Set dimensions, tweak spacing, and get a PNG back instantly."
         />
         <meta name="twitter:image" content={ogImageUrl} />
+        <meta
+          name="google-site-verification"
+          content="W-MoMLbOEiODbIQuB--Urae1Aw3EQBIZ3S7xq7Xzpx4"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "Wall HTML",
-              "url": "https://wall.saifuddm.work/",
-              "description":
+              name: "Wall HTML",
+              url: "https://wall.saifuddm.work/",
+              description:
                 "Turn any text into bold typographic screenshots. Set dimensions, tweak spacing, and get a PNG back instantly via Cloudflare Workers.",
-              "applicationCategory": "DesignApplication",
-              "operatingSystem": "Any",
-              "offers": {
+              applicationCategory: "DesignApplication",
+              operatingSystem: "Any",
+              offers: {
                 "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD",
+                price: "0",
+                priceCurrency: "USD",
               },
-              "aggregateRating": {
+              aggregateRating: {
                 "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "50",
-                "bestRating": "5",
-                "worstRating": "1",
+                ratingValue: "4.8",
+                ratingCount: "50",
+                bestRating: "5",
+                worstRating: "1",
               },
             }),
           }}
         />
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js" defer />
+        <script
+          src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"
+          defer
+        />
       </head>
       <body class="bg-surface">{children}</body>
     </html>
