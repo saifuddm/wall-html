@@ -95,3 +95,30 @@
   border-color: rgba(181, 255, 43, 0.2);
   transform: translateX(4px);
 }
+
+.preset-btn:hover {
+  transform: translateY(-2px);
+}
+.preset-active {
+  border-color: var(--color-lime-glow) !important;
+  background: rgba(181, 255, 43, 0.08) !important;
+  box-shadow: 0 0 16px rgba(181, 255, 43, 0.15);
+}
+.preset-active i,
+.preset-active span {
+  color: var(--color-lime-glow) !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(181, 255, 43, 0.3);
+}

@@ -107,7 +107,7 @@ const LandingPage = () => {
           </div>
 
           {/* ─── Builder form ─── */}
-          <section class="animate-slide-up-3 lg:col-span-3 rounded-3xl border border-border bg-card p-6 sm:p-8">
+          <section class="animate-slide-up-3 lg:col-span-3 min-w-0 rounded-3xl border border-border bg-card p-6 sm:p-8">
             <div class="space-y-6">
               <div class="space-y-1">
                 <h2 class="font-display text-2xl font-black tracking-tight sm:text-3xl">
@@ -124,6 +124,39 @@ const LandingPage = () => {
                 method="get"
                 target="_blank"
               >
+                {/* Quick size presets */}
+                <div class="space-y-1.5">
+                  <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                    Quick sizes
+                  </span>
+                  <div class="flex gap-2 overflow-x-auto pt-2 pb-2 scrollbar-thin">
+                    {[
+                      { icon: "smartphone", label: "Story", w: 1080, h: 1920 },
+                      { icon: "square", label: "Square", w: 1080, h: 1080 },
+                      { icon: "monitor", label: "Desktop", w: 1920, h: 1080 },
+                      { icon: "tablet", label: "Tablet", w: 1668, h: 2388 },
+                      { icon: "share-2", label: "Social Card", w: 1200, h: 630 },
+                      { icon: "play", label: "YouTube", w: 1280, h: 720 },
+                      { icon: "image", label: "Banner", w: 1500, h: 500 },
+                    ].map((preset) => (
+                      <button
+                        type="button"
+                        class="preset-btn step-card group flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 cursor-pointer transition-all hover:border-lime-glow/40 shrink-0"
+                        data-w={preset.w}
+                        data-h={preset.h}
+                      >
+                        <i data-lucide={preset.icon} class="h-5 w-5 text-slate-500 group-hover:text-lime-glow transition-colors" />
+                        <span class="font-mono text-[11px] font-bold text-slate-300 group-hover:text-lime-glow transition-colors whitespace-nowrap">
+                          {preset.label}
+                        </span>
+                        <span class="font-mono text-[10px] text-slate-600">
+                          {preset.w}×{preset.h}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Dimensions */}
                 <div class="grid gap-4 sm:grid-cols-2">
                   <label class="space-y-1.5">
@@ -249,7 +282,7 @@ const LandingPage = () => {
 
         {/* ─── Footer ─── */}
         <footer class="animate-slide-up-4 flex items-center justify-between border-t border-border pt-6 font-mono text-[11px] text-slate-600">
-          <span>built on cloudflare workers</span>
+          <a href="https://github.com/saifuddm" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-lime-glow transition-colors no-underline">@saifuddm</a>
           <span class="flex items-center gap-1.5">
             <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse-glow" />
             api online
@@ -309,6 +342,42 @@ const LandingPage = () => {
         dangerouslySetInnerHTML={{
           __html: `
 (function() {
+  // Initialize Lucide icons
+  if (window.lucide) lucide.createIcons();
+  else document.addEventListener('DOMContentLoaded', function() {
+    var check = setInterval(function() { if (window.lucide) { lucide.createIcons(); clearInterval(check); } }, 50);
+    setTimeout(function() { clearInterval(check); }, 3000);
+  });
+
+  // Preset size buttons
+  var presetBtns = document.querySelectorAll('.preset-btn');
+  var widthInput = document.querySelector('input[name="width"]');
+  var heightInput = document.querySelector('input[name="height"]');
+
+  function syncPresetHighlight() {
+    var w = widthInput.value;
+    var h = heightInput.value;
+    presetBtns.forEach(function(btn) {
+      if (btn.dataset.w === w && btn.dataset.h === h) {
+        btn.classList.add('preset-active');
+      } else {
+        btn.classList.remove('preset-active');
+      }
+    });
+  }
+
+  presetBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      widthInput.value = btn.dataset.w;
+      heightInput.value = btn.dataset.h;
+      syncPresetHighlight();
+    });
+  });
+
+  widthInput.addEventListener('input', syncPresetHighlight);
+  heightInput.addEventListener('input', syncPresetHighlight);
+  syncPresetHighlight();
+
   var overlay = document.getElementById('preview-overlay');
   var iframe = document.getElementById('preview-iframe');
   var wrapper = document.getElementById('preview-wrapper');

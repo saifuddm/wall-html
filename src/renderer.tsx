@@ -67,6 +67,7 @@ export const renderer = jsxRenderer(({ children }, c) => {
         />
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
+        <script src="https://unpkg.com/lucide@latest" defer />
       </head>
       <body class="bg-surface">{children}</body>
     </html>
