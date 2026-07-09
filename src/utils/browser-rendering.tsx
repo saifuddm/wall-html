@@ -54,6 +54,14 @@ export const createBrowserRenderingRequest = ({
   };
 };
 
+export const hasBrowserRenderingConfig = (
+  env: BrowserRenderingEnv,
+): boolean => {
+  return Boolean(
+    env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_BROWSER_RENDERING_API_TOKEN,
+  );
+};
+
 export const getBrowserRenderingConfig = (
   env: BrowserRenderingEnv,
 ): {
