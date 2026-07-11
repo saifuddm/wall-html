@@ -89,6 +89,9 @@ app.get("/screenshot-rest-url", async (c) => {
           waitUntil: "networkidle2",
           timeout: 45000,
         });
+        await page.waitForSelector("html[data-fonts-loaded]", {
+          timeout: 20000,
+        });
         const screenshot = await page.screenshot({ type: "png" });
         return new Response(screenshot, {
           status: 200,
@@ -98,6 +101,7 @@ app.get("/screenshot-rest-url", async (c) => {
         await browser.close();
       }
     }
+    console.log("Called cloudflare rendering")
 
     const { accountId, apiToken } = getBrowserRenderingConfig(c.env);
 

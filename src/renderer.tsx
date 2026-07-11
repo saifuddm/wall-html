@@ -76,6 +76,12 @@ export const renderer = jsxRenderer(({ children }, c) => {
             }),
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "addEventListener('load',function(){document.fonts.ready.then(function(){document.documentElement.setAttribute('data-fonts-loaded','true');});});",
+          }}
+        />
         <ViteClient />
         <Link href="/src/style.css" rel="stylesheet" />
         <script

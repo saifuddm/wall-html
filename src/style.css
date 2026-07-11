@@ -1,6 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap");
+/* Self-hosted fonts (from Google Fonts): Cloudflare Browser Rendering cannot
+   reliably fetch fonts.googleapis.com, so we serve the files from our origin. */
+@import "./fonts.css";
 @import "tailwindcss";
 
 @theme {

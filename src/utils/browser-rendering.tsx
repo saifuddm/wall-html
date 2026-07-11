@@ -51,6 +51,12 @@ export const createBrowserRenderingRequest = ({
       waitUntil: "networkidle2",
       timeout: 45000,
     },
+    // The page sets this attribute once document.fonts.ready resolves, so the
+    // screenshot is never captured while the fallback font is still shown.
+    waitForSelector: {
+      selector: "html[data-fonts-loaded]",
+      timeout: 20000,
+    },
   };
 };
 

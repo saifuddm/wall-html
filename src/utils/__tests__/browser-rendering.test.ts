@@ -73,6 +73,10 @@ describe("createBrowserRenderingRequest", () => {
         waitUntil: "networkidle2",
         timeout: 45000,
       },
+      waitForSelector: {
+        selector: "html[data-fonts-loaded]",
+        timeout: 20000,
+      },
     });
   });
 
