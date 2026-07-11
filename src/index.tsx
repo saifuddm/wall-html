@@ -31,8 +31,14 @@ app.get("/", (c) => {
 });
 
 app.get("/text-background", (c) => {
-  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
-    validateRoute(c.req.query());
+  const {
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
+    seed,
+  } = validateRoute(c.req.query());
   return c.render(
     <TextBackground
       width={width}
@@ -40,6 +46,7 @@ app.get("/text-background", (c) => {
       displayText={displayText}
       randomTextToggle={randomTextToggle}
       cutOffTextToggle={cutOffTextToggle}
+      seed={seed}
     />,
   );
 });
@@ -52,8 +59,14 @@ app.get("/health", (c) => {
 });
 
 app.get("/screenshot-rest-url", async (c) => {
-  const { width, height, displayText, randomTextToggle, cutOffTextToggle } =
-    validateScreenshot(c.req.query());
+  const {
+    width,
+    height,
+    displayText,
+    randomTextToggle,
+    cutOffTextToggle,
+    seed,
+  } = validateScreenshot(c.req.query());
   const origin = new URL(c.req.url).origin;
   const targetUrl = buildTextBackgroundUrl({
     origin,
@@ -62,6 +75,7 @@ app.get("/screenshot-rest-url", async (c) => {
     displayText,
     randomTextToggle,
     cutOffTextToggle,
+    seed,
   });
 
   const etag = `"${await crypto.subtle.digest("SHA-256", new TextEncoder().encode(targetUrl)).then((buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("")).then((hex) => hex.slice(0, 32))}"`;

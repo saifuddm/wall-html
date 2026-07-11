@@ -1,5 +1,101 @@
 import { describe, it, expect } from "vitest";
-import { mapWordsToCharacters } from "../text-background";
+import { getDisplayText, mapWordsToCharacters } from "../text-background";
+import { createRandom } from "../../utils/random";
+
+const renderElements = (params: {
+  displayText: string;
+  cutOffTextToggle: boolean;
+  cpl: number;
+  seed?: string;
+  randomTextToggle?: boolean;
+}) =>
+  getDisplayText({
+    displayText: params.displayText,
+    randomTextToggle: params.randomTextToggle ?? true,
+    cutOffTextToggle: params.cutOffTextToggle,
+    wordMap: mapWordsToCharacters({ displayText: params.displayText }),
+    cpl: params.cpl,
+    random: createRandom(params.seed ?? "test"),
+  });
+
+describe("getDisplayText newline handling", () => {
+  it("pads to the end of the line in cut-off mode", () => {
+    // "abc" (3 cells) + newline pads 7 more + "de" (2 cells)
+    const elements = renderElements({
+      displayText: "abc\nde",
+      cutOffTextToggle: true,
+      cpl: 10,
+    });
+    expect(elements.length).toBe(12);
+  });
+
+  it("pads a full blank line for a double newline", () => {
+    // "abc" + pad 7 + blank line of 10 + "de"
+    const elements = renderElements({
+      displayText: "abc\n\nde",
+      cutOffTextToggle: true,
+      cpl: 10,
+    });
+    expect(elements.length).toBe(22);
+  });
+
+  it("pads to the end of the line in word mode", () => {
+    // "hello" (5 cells) + newline pads 5 more + "world" (5 cells)
+    const elements = renderElements({
+      displayText: "hello\nworld",
+      cutOffTextToggle: false,
+      cpl: 10,
+    });
+    expect(elements.length).toBe(15);
+  });
+
+  it("counts spaces around a newline as cells in word mode", () => {
+    // "hi" (2) + " " (1) + newline pads 7 + " " (1) + "yo" (2)
+    const elements = renderElements({
+      displayText: "hi \n yo",
+      cutOffTextToggle: false,
+      cpl: 10,
+    });
+    expect(elements.length).toBe(13);
+  });
+
+  it("does not pad when cpl is zero", () => {
+    const elements = renderElements({
+      displayText: "ab\ncd",
+      cutOffTextToggle: true,
+      cpl: 0,
+    });
+    expect(elements.length).toBe(4);
+  });
+});
+
+describe("getDisplayText determinism", () => {
+  it("renders identical filler for the same seed", () => {
+    const run = () =>
+      JSON.stringify(
+        renderElements({
+          displayText: "a  b\nc",
+          cutOffTextToggle: true,
+          cpl: 10,
+          seed: "wall",
+        }),
+      );
+    expect(run()).toBe(run());
+  });
+
+  it("renders different filler for different seeds", () => {
+    const withSeed = (seed: string) =>
+      JSON.stringify(
+        renderElements({
+          displayText: "a                b",
+          cutOffTextToggle: true,
+          cpl: 10,
+          seed,
+        }),
+      );
+    expect(withSeed("wall")).not.toBe(withSeed("html"));
+  });
+});
 
 describe("mapWordsToCharacters", () => {
   it("segments simple text into words and spaces", () => {

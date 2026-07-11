@@ -4,6 +4,7 @@ import {
   calculateLpp,
   isEmoji,
 } from "../utils/text-background-validation";
+import { createRandom } from "../utils/random";
 import logger from "../utils/logger";
 
 type TextBackgroundProps = {
@@ -12,19 +13,52 @@ type TextBackgroundProps = {
   displayText: string;
   randomTextToggle: boolean;
   cutOffTextToggle: boolean;
+  seed: string;
 };
 
-const getRandomText = ({ charCount }: { charCount: number }) => {
+type RandomFn = () => number;
+
+const getRandomText = ({
+  charCount,
+  random,
+}: {
+  charCount: number;
+  random: RandomFn;
+}) => {
   const randomTextElements: JSX.Element[] = [];
 
   for (let i = 0; i < charCount; i++) {
     randomTextElements.push(
       <span class="opacity-25 font-display uppercase">
-        {String.fromCharCode(Math.floor(Math.random() * 26) + 97)}
+        {String.fromCharCode(Math.floor(random() * 26) + 97)}
       </span>,
     );
   }
   return randomTextElements;
+};
+
+// Fill the rest of the current line with filler cells so the next character
+// lands on a fresh line. At a line start, pads a full line ("\n\n" shows a
+// visible blank line).
+const padToLineEnd = ({
+  elements,
+  cpl,
+  randomTextToggle,
+  random,
+}: {
+  elements: JSX.Element[];
+  cpl: number;
+  randomTextToggle: boolean;
+  random: RandomFn;
+}) => {
+  if (cpl <= 0) return;
+  const used = elements.length % cpl;
+  const padCount = used === 0 ? cpl : cpl - used;
+  for (let i = 0; i < padCount; i++) {
+    elements.push(
+      ...handleDisplayCharacter({ char: " ", randomTextToggle, random }),
+    );
+  }
 };
 
 const getDisplayText = ({
@@ -33,19 +67,41 @@ const getDisplayText = ({
   cutOffTextToggle,
   wordMap,
   cpl,
+  random,
 }: {
   displayText: string;
   randomTextToggle: boolean;
   cutOffTextToggle: boolean;
   wordMap: string[];
   cpl: number;
+  random: RandomFn;
 }) => {
   const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
   const displayTextElements: JSX.Element[] = [];
-  let lineTracker = 0;
   if (!cutOffTextToggle) {
     for (const word of wordMap) {
-      let remainingCpl = cpl - displayTextElements.length + lineTracker * cpl;
+      // Whitespace runs containing newlines come through as single segments
+      // (e.g. " \n "), so handle them character by character.
+      if (word.includes("\n")) {
+        for (const char of word) {
+          if (char === "\n") {
+            padToLineEnd({
+              elements: displayTextElements,
+              cpl,
+              randomTextToggle,
+              random,
+            });
+          } else {
+            displayTextElements.push(
+              ...handleDisplayCharacter({ char, randomTextToggle, random }),
+            );
+          }
+        }
+        continue;
+      }
+
+      const remainingCpl =
+        cpl > 0 ? cpl - (displayTextElements.length % cpl) : 0;
 
       let wordLength = word.length;
       if (isEmoji(word)) {
@@ -55,7 +111,11 @@ const getDisplayText = ({
       if (wordLength < remainingCpl) {
         for (const { segment } of segmenter.segment(word)) {
           displayTextElements.push(
-            ...handleDisplayCharacter({ char: segment, randomTextToggle }),
+            ...handleDisplayCharacter({
+              char: segment,
+              randomTextToggle,
+              random,
+            }),
           );
         }
       } else {
@@ -63,14 +123,17 @@ const getDisplayText = ({
         // cannot fit word in remaining space, pad with random text
         for (let i = 0; i < remainingCpl; i++) {
           displayTextElements.push(
-            ...handleDisplayCharacter({ char: " ", randomTextToggle }),
+            ...handleDisplayCharacter({ char: " ", randomTextToggle, random }),
           );
         }
-        lineTracker++;
         // after padding with random text, add word to display text elements
         for (const { segment } of segmenter.segment(word)) {
           displayTextElements.push(
-            ...handleDisplayCharacter({ char: segment, randomTextToggle }),
+            ...handleDisplayCharacter({
+              char: segment,
+              randomTextToggle,
+              random,
+            }),
           );
         }
       }
@@ -80,8 +143,17 @@ const getDisplayText = ({
   }
 
   for (const { segment } of segmenter.segment(displayText)) {
+    if (segment === "\n") {
+      padToLineEnd({
+        elements: displayTextElements,
+        cpl,
+        randomTextToggle,
+        random,
+      });
+      continue;
+    }
     displayTextElements.push(
-      ...handleDisplayCharacter({ char: segment, randomTextToggle }),
+      ...handleDisplayCharacter({ char: segment, randomTextToggle, random }),
     );
   }
   return displayTextElements;
@@ -90,9 +162,11 @@ const getDisplayText = ({
 const handleDisplayCharacter = ({
   char,
   randomTextToggle,
+  random,
 }: {
   char: string;
   randomTextToggle: boolean;
+  random: RandomFn;
 }) => {
   if (isEmoji(char)) {
     logger.debug({ char }, "emoji found");
@@ -113,7 +187,7 @@ const handleDisplayCharacter = ({
     if (randomTextToggle) {
       return [
         <span class="opacity-25 font-display uppercase">
-          {String.fromCharCode(Math.floor(Math.random() * 26) + 97)}
+          {String.fromCharCode(Math.floor(random() * 26) + 97)}
         </span>,
       ];
     }
@@ -140,37 +214,48 @@ const TextBackground = ({
   displayText,
   randomTextToggle,
   cutOffTextToggle,
+  seed,
 }: TextBackgroundProps) => {
+  const random = createRandom(seed);
+  // Form submissions normalize textarea newlines to CRLF.
+  const normalizedText = displayText.replace(/\r\n?/g, "\n");
   const cpl = calculateCpl(width);
   const lpp = calculateLpp(height);
   const totalNumberOfCharacters = cpl * lpp;
-  const wordMap = mapWordsToCharacters({ displayText });
+  const wordMap = mapWordsToCharacters({ displayText: normalizedText });
   const displayTextElements = getDisplayText({
-    displayText,
+    displayText: normalizedText,
     randomTextToggle,
     cutOffTextToggle,
     wordMap,
     cpl,
+    random,
   });
   const remainingCharacters =
     totalNumberOfCharacters - displayTextElements.length;
 
   logger.info({ cpl, lpp, totalChars: totalNumberOfCharacters, displayChars: displayTextElements.length }, "rendering text background");
 
-  // top half of random text
+  // top half of random text — line-aligned when the text spans multiple
+  // lines (word mode overflow or explicit newlines), otherwise offset so a
+  // single line of text sits horizontally centered
   const topHalfRandomTextElements =
-    !cutOffTextToggle && displayTextElements.length > cpl
+    (!cutOffTextToggle && displayTextElements.length > cpl) ||
+    normalizedText.includes("\n")
       ? getRandomText({
           charCount: Math.round(remainingCharacters / 2 / cpl) * cpl,
+          random,
         })
       : getRandomText({
           charCount:
             Math.round(remainingCharacters / 2 / cpl) * cpl +
             Math.floor((cpl - displayTextElements.length) / 2),
+          random,
         });
   // bottom half of random text
   const bottomHalfRandomTextElements = getRandomText({
     charCount: remainingCharacters - topHalfRandomTextElements.length,
+    random,
   });
 
   return (
@@ -186,4 +271,10 @@ const TextBackground = ({
 };
 
 export default TextBackground;
-export { getRandomText, getDisplayText, handleDisplayCharacter, mapWordsToCharacters };
+export {
+  getRandomText,
+  getDisplayText,
+  handleDisplayCharacter,
+  mapWordsToCharacters,
+  padToLineEnd,
+};

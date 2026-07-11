@@ -4,6 +4,7 @@ type TextBackgroundScreenshotProps = {
   displayText: string;
   randomTextToggle: boolean;
   cutOffTextToggle: boolean;
+  seed: string;
 };
 
 type BrowserRenderingEnv = {
@@ -18,6 +19,7 @@ export const buildTextBackgroundUrl = ({
   displayText,
   randomTextToggle,
   cutOffTextToggle,
+  seed,
 }: TextBackgroundScreenshotProps & {
   origin: string;
 }): string => {
@@ -27,6 +29,7 @@ export const buildTextBackgroundUrl = ({
   target.searchParams.set("displayText", displayText);
   target.searchParams.set("randomTextToggle", randomTextToggle.toString());
   target.searchParams.set("cutOffTextToggle", cutOffTextToggle.toString());
+  target.searchParams.set("seed", seed);
 
   return target.toString();
 };

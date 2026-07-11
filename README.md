@@ -17,6 +17,8 @@ Project is a Cloudflare Workers service that generates text wallpaper/background
 - Calculates characters-per-line and lines-per-page from pixel dimensions (font size 128px, padding 64px, glyph width ratio 0.6)
 - Supports word-aware wrapping (`cutOffTextToggle=false`) or continuous fill (`cutOffTextToggle=true`)
 - Random lowercase letters fill empty space at 25% opacity (`randomTextToggle`)
+- All randomness is seeded (`seed` param, `src/utils/random.ts`), so identical URLs render identical walls — the live preview always matches the generated screenshot
+- Layout control characters in `displayText`: extra spaces become filler cells (one grid cell each), and `\n` pads the rest of the current line so following text starts on a new line (`\n\n` yields a blank line)
 - Emoji characters get special 3ch-wide rendering with hidden spacing elements
 - Uses `Intl.Segmenter` for word boundary detection
 
@@ -24,4 +26,4 @@ Project is a Cloudflare Workers service that generates text wallpaper/background
 
 ## Key Parameters
 
-All routes accept: `width`, `height`, `displayText`, `randomTextToggle`, `cutOffTextToggle`. Defaults for screenshot routes: 1000×1000, random text enabled with default sample text.
+All routes accept: `width`, `height`, `displayText`, `randomTextToggle`, `cutOffTextToggle`, `seed`. Defaults for screenshot routes: 1000×1000, random text enabled with default sample text, seed `"default"`.

@@ -104,6 +104,7 @@ describe("validateRoute", () => {
       displayText: "This is a test of the text background generator 🪨",
       randomTextToggle: true,
       cutOffTextToggle: true,
+      seed: "default",
     });
   });
 
@@ -114,6 +115,7 @@ describe("validateRoute", () => {
       displayText: "Hello world",
       randomTextToggle: "false",
       cutOffTextToggle: "false",
+      seed: "abc123",
     });
     expect(result).toEqual({
       width: 1920,
@@ -121,6 +123,7 @@ describe("validateRoute", () => {
       displayText: "Hello world",
       randomTextToggle: false,
       cutOffTextToggle: false,
+      seed: "abc123",
     });
   });
 

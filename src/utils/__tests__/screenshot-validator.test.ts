@@ -10,6 +10,7 @@ describe("validateScreenshot", () => {
       displayText: "This is a test of the text background generator 🪨",
       randomTextToggle: true,
       cutOffTextToggle: true,
+      seed: "default",
     });
   });
 
@@ -20,6 +21,7 @@ describe("validateScreenshot", () => {
       displayText: "Custom text",
       randomTextToggle: "false",
       cutOffTextToggle: "false",
+      seed: "abc123",
     });
     expect(result).toEqual({
       width: 1920,
@@ -27,6 +29,7 @@ describe("validateScreenshot", () => {
       displayText: "Custom text",
       randomTextToggle: false,
       cutOffTextToggle: false,
+      seed: "abc123",
     });
   });
 

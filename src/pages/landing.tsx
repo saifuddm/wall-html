@@ -7,7 +7,7 @@ const LandingPage = () => {
 
       <div class="relative z-10 mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-16 lg:py-20">
         {/* ─── Hero ─── */}
-        <section class="lcp-visible space-y-6">
+        <section class="lcp-visible space-y-6" id="hero-section">
           <div class="flex items-center gap-3">
             <span class="inline-block rounded-full border border-border bg-card px-3 py-1 font-mono text-xs tracking-widest text-lime-glow uppercase">
               wall-html
@@ -27,9 +27,9 @@ const LandingPage = () => {
           </p>
         </section>
 
-        <div class="grid gap-6 lg:grid-cols-5">
+        <div class="grid gap-6 lg:grid-cols-5" id="main-grid">
           {/* ─── How it works ─── */}
-          <div class="animate-slide-up-2 lg:col-span-2 space-y-4">
+          <div class="animate-slide-up-2 lg:col-span-2 space-y-4" id="info-column">
             <h2 class="font-display text-lg font-bold tracking-tight text-slate-300 uppercase">
               How it works
             </h2>
@@ -47,8 +47,8 @@ const LandingPage = () => {
                 },
                 {
                   n: "03",
-                  title: "Toggle the vibes",
-                  desc: "Randomize letter spacing, allow cut-off text for that raw, graphic look.",
+                  title: "Tune the layout",
+                  desc: "Space out letters or words, push text onto new lines — live preview as you go.",
                 },
                 {
                   n: "04",
@@ -107,25 +107,32 @@ const LandingPage = () => {
           </div>
 
           {/* ─── Builder form ─── */}
-          <section class="animate-slide-up-3 lg:col-span-3 min-w-0 rounded-3xl border border-border bg-card p-6 sm:p-8">
+          <section
+            class="animate-slide-up-3 lg:col-span-3 min-w-0 rounded-3xl border border-border bg-card p-6 sm:p-8"
+            id="builder-section"
+          >
             <div class="space-y-6">
-              <div class="space-y-1">
-                <h2 class="font-display text-2xl font-black tracking-tight sm:text-3xl">
-                  Build a request
-                </h2>
-                <p class="font-mono text-xs text-slate-500">
-                  configure → preview → generate your png
-                </p>
+              <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <h2 class="font-display text-2xl font-black tracking-tight sm:text-3xl">
+                    Build a request
+                  </h2>
+                  <p class="font-mono text-xs text-slate-500">
+                    configure → tune layout → generate your png
+                  </p>
+                </div>
+                <button
+                  class="hidden shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-mono text-[11px] text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 cursor-pointer"
+                  id="editor-exit"
+                  type="button"
+                >
+                  ← back to setup
+                </button>
               </div>
 
-              <form
-                action="/screenshot-rest-url"
-                class="space-y-5"
-                method="get"
-                target="_blank"
-              >
+              <form class="space-y-5" id="builder-form">
                 {/* Quick size presets */}
-                <div class="space-y-1.5">
+                <div class="space-y-1.5" id="presets-block">
                   <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                     Quick sizes
                   </span>
@@ -141,7 +148,7 @@ const LandingPage = () => {
                     ].map((preset) => (
                       <button
                         type="button"
-                        class="preset-btn step-card group flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 cursor-pointer transition-all hover:border-lime-glow/40 shrink-0"
+                        class="preset-btn step-card group flex flex-col items-center gap-1.5 rounded-xl border border-border bg-surface px-4 py-3 cursor-pointer transition-all hover:border-lime-glow/40 shrink-0 disabled:opacity-40 disabled:pointer-events-none"
                         data-w={preset.w}
                         data-h={preset.h}
                       >
@@ -158,13 +165,13 @@ const LandingPage = () => {
                 </div>
 
                 {/* Dimensions */}
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-4 sm:grid-cols-2" id="dimensions-block">
                   <label class="space-y-1.5">
                     <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                       Width
                     </span>
                     <input
-                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
+                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow disabled:opacity-40"
                       min="1"
                       name="width"
                       placeholder="1080"
@@ -178,7 +185,7 @@ const LandingPage = () => {
                       Height
                     </span>
                     <input
-                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
+                      class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow disabled:opacity-40"
                       min="1"
                       name="height"
                       placeholder="1920"
@@ -194,18 +201,19 @@ const LandingPage = () => {
                   <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                     Display text
                   </span>
-                  <input
-                    class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow"
+                  <textarea
+                    class="input-glow w-full rounded-xl border border-border bg-surface px-4 py-3 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-lime-glow resize-y"
                     name="displayText"
                     placeholder="your text goes here..."
                     required
-                    type="text"
-                    value="This is a test of the text background generator"
-                  />
+                    rows={3}
+                  >
+                    This is a test of the text background generator
+                  </textarea>
                 </label>
 
                 {/* Toggles */}
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="grid gap-4 sm:grid-cols-2" id="toggles-block">
                   <fieldset class="space-y-2">
                     <legend class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
                       Random spacing
@@ -261,19 +269,123 @@ const LandingPage = () => {
                   </fieldset>
                 </div>
 
-                {/* Submit */}
-                <div class="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+                {/* Enter editor */}
+                <div
+                  class="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between"
+                  id="editor-enter-row"
+                >
                   <p class="font-mono text-[11px] leading-5 text-slate-600">
-                    Preview first, then generate your screenshot.
+                    Tune the layout live, then generate your screenshot.
                   </p>
                   <button
                     class="btn-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-sm font-bold text-surface tracking-wide cursor-pointer"
-                    id="preview-btn"
+                    id="editor-enter"
                     type="button"
                   >
-                    <span>Preview</span>
+                    <span>Edit layout</span>
                     <span class="text-base">→</span>
                   </button>
+                </div>
+
+                {/* ─── Layout editor (hidden until entered) ─── */}
+                <div class="hidden space-y-4 border-t border-border pt-5" id="editor-section">
+                  {/* Token controls */}
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                        Select &amp; move
+                      </span>
+                      <div class="flex rounded-full border border-border bg-surface p-0.5 font-mono text-[11px]">
+                        <button
+                          class="mode-btn rounded-full px-3 py-1 cursor-pointer text-slate-400"
+                          data-mode="word"
+                          type="button"
+                        >
+                          Word
+                        </button>
+                        <button
+                          class="mode-btn rounded-full px-3 py-1 cursor-pointer text-slate-400"
+                          data-mode="letter"
+                          type="button"
+                        >
+                          Letter
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      class="flex flex-wrap items-center gap-1.5 rounded-xl border border-border bg-surface p-3 min-h-12"
+                      id="token-strip"
+                    />
+
+                    <div class="flex flex-wrap gap-2 font-mono text-[11px]">
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="space-before" type="button">
+                        + space before
+                      </button>
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="space-after" type="button">
+                        + space after
+                      </button>
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="unspace-before" type="button">
+                        − space before
+                      </button>
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="unspace-after" type="button">
+                        − space after
+                      </button>
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="newline-before" type="button">
+                        ↵ line before
+                      </button>
+                      <button class="editor-action rounded-full border border-border bg-surface px-3 py-1.5 text-slate-300 hover:border-lime-glow/40 hover:text-lime-glow cursor-pointer disabled:opacity-40 disabled:pointer-events-none" data-action="newline-after" type="button">
+                        ↵ line after
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Live preview */}
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span class="font-mono text-xs font-bold tracking-wider text-slate-400 uppercase">
+                        Live preview
+                      </span>
+                      <button
+                        class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 font-mono text-[11px] text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 cursor-pointer"
+                        id="seed-reroll"
+                        title="Re-roll the random filler letters"
+                        type="button"
+                      >
+                        <i data-lucide="shuffle" class="h-3 w-3" />
+                        <span>shuffle filler</span>
+                      </button>
+                    </div>
+                    <div class="flex justify-center rounded-xl border border-border bg-surface p-3">
+                      <div class="overflow-hidden" id="preview-wrapper">
+                        <iframe class="border-none block" id="preview-iframe" />
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                      <span
+                        class="rounded-full bg-surface px-3 py-1 font-mono text-xs text-slate-500"
+                        id="preview-dimensions"
+                      />
+                      <div class="flex items-center gap-2">
+                        <a
+                          class="btn-outline inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-mono text-[11px] text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 no-underline"
+                          id="preview-open-tab"
+                          href="#"
+                          target="_blank"
+                        >
+                          Open in tab
+                        </a>
+                        <a
+                          class="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-mono text-[11px] font-bold text-surface no-underline cursor-pointer"
+                          id="preview-screenshot"
+                          href="#"
+                          target="_blank"
+                        >
+                          Generate Screenshot
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>
@@ -288,54 +400,6 @@ const LandingPage = () => {
             api online
           </span>
         </footer>
-      </div>
-
-      {/* ─── Preview modal ─── */}
-      <div
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 backdrop-blur-sm"
-        id="preview-overlay"
-      >
-        <div class="rounded-3xl border border-border bg-card shadow-2xl overflow-hidden max-w-[90vw] max-h-[90vh] flex flex-col">
-          <div class="flex items-center justify-between border-b border-border px-5 py-3">
-            <span class="font-mono text-sm font-bold text-slate-400">
-              Preview
-            </span>
-            <button
-              class="rounded-full p-1.5 text-slate-500 hover:text-lime-glow hover:bg-surface transition-colors cursor-pointer text-lg leading-none"
-              id="preview-close"
-              type="button"
-            >
-              &times;
-            </button>
-          </div>
-          <div class="overflow-hidden" id="preview-wrapper">
-            <iframe class="border-none block" id="preview-iframe" />
-          </div>
-          <div class="flex items-center justify-between gap-3 border-t border-border px-5 py-3">
-            <span
-              class="rounded-full bg-surface px-3 py-1 font-mono text-xs text-slate-500"
-              id="preview-dimensions"
-            />
-            <div class="flex items-center gap-2">
-              <a
-                class="btn-outline inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-mono text-[11px] text-slate-400 hover:text-lime-glow hover:border-lime-glow/30 no-underline"
-                id="preview-open-tab"
-                href="#"
-                target="_blank"
-              >
-                Open in tab
-              </a>
-              <a
-                class="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 font-mono text-[11px] font-bold text-surface no-underline cursor-pointer"
-                id="preview-screenshot"
-                href="#"
-                target="_blank"
-              >
-                Generate Screenshot
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
 
       <script
@@ -383,65 +447,275 @@ const LandingPage = () => {
   heightInput.addEventListener('input', syncPresetHighlight);
   requestAnimationFrame(syncPresetHighlight);
 
-  var overlay = document.getElementById('preview-overlay');
+  // ─── Layout editor ───
+  var form = document.getElementById('builder-form');
+  var textarea = form.querySelector('textarea[name="displayText"]');
+  var heroSection = document.getElementById('hero-section');
+  var infoColumn = document.getElementById('info-column');
+  var mainGrid = document.getElementById('main-grid');
+  var builderSection = document.getElementById('builder-section');
+  var enterRow = document.getElementById('editor-enter-row');
+  var enterBtn = document.getElementById('editor-enter');
+  var exitBtn = document.getElementById('editor-exit');
+  var editorSection = document.getElementById('editor-section');
+  var tokenStrip = document.getElementById('token-strip');
+  var modeBtns = document.querySelectorAll('.mode-btn');
+  var actionBtns = document.querySelectorAll('.editor-action');
   var iframe = document.getElementById('preview-iframe');
   var wrapper = document.getElementById('preview-wrapper');
-  var previewBtn = document.getElementById('preview-btn');
-  var closeBtn = document.getElementById('preview-close');
   var dimLabel = document.getElementById('preview-dimensions');
   var openTab = document.getElementById('preview-open-tab');
   var screenshotBtn = document.getElementById('preview-screenshot');
+  var rerollBtn = document.getElementById('seed-reroll');
 
-  if (!overlay || !iframe || !wrapper || !previewBtn) return;
+  // The SSR textarea content is indented by JSX; normalize it once.
+  textarea.value = textarea.value.trim();
 
-  var MAX_W = 600;
-  var MAX_H = 500;
+  var seed = Math.random().toString(36).slice(2, 10);
+  var mode = 'word';
+  var selectedOrdinal = null;
+  var editing = false;
+  var debounceTimer = null;
+  var graphemeSegmenter = window.Intl && Intl.Segmenter
+    ? new Intl.Segmenter('en', { granularity: 'grapheme' })
+    : null;
 
-  previewBtn.addEventListener('click', function(e) {
-    var form = previewBtn.closest('form');
+  function buildParams() {
     var formData = new FormData(form);
-    var params = new URLSearchParams(formData).toString();
-    var previewUrl = '/text-background?' + params;
-    var screenshotUrl = '/screenshot-rest-url?' + params;
+    var params = new URLSearchParams(formData);
+    // Disabled inputs are excluded from FormData, so set dimensions explicitly.
+    params.set('width', widthInput.value);
+    params.set('height', heightInput.value);
+    params.set('seed', seed);
+    return params;
+  }
 
-    var w = parseInt(formData.get('width')) || 1080;
-    var h = parseInt(formData.get('height')) || 1920;
+  function updatePreview() {
+    var params = buildParams();
+    var previewUrl = '/text-background?' + params.toString();
+    var screenshotUrl = '/screenshot-rest-url?' + params.toString();
 
-    var scaleX = MAX_W / w;
-    var scaleY = MAX_H / h;
-    var scale = Math.min(scaleX, scaleY, 1);
+    var w = parseInt(widthInput.value) || 1080;
+    var h = parseInt(heightInput.value) || 1920;
+
+    var maxW = Math.min(builderSection.clientWidth - 80, 640);
+    var maxH = Math.round(window.innerHeight * 0.55);
+    var scale = Math.min(maxW / w, maxH / h, 1);
 
     iframe.style.width = w + 'px';
     iframe.style.height = h + 'px';
     iframe.style.transform = 'scale(' + scale + ')';
     iframe.style.transformOrigin = 'top left';
-
     wrapper.style.width = Math.round(w * scale) + 'px';
     wrapper.style.height = Math.round(h * scale) + 'px';
 
     dimLabel.textContent = w + ' \\u00d7 ' + h + ' (scaled ' + Math.round(scale * 100) + '%)';
     openTab.href = previewUrl;
     screenshotBtn.href = screenshotUrl;
-
-    iframe.src = previewUrl;
-    overlay.classList.remove('hidden');
-    overlay.classList.add('flex');
-  });
-
-  function closeModal() {
-    overlay.classList.add('hidden');
-    overlay.classList.remove('flex');
-    iframe.src = 'about:blank';
+    if (iframe.dataset.src !== previewUrl) {
+      iframe.dataset.src = previewUrl;
+      iframe.src = previewUrl;
+    }
   }
 
-  closeBtn.addEventListener('click', closeModal);
+  function schedulePreview() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updatePreview, 400);
+  }
 
-  overlay.addEventListener('click', function(e) {
-    if (e.target === overlay) closeModal();
+  // Tokenize the textarea value into selectable tokens with string offsets.
+  function getTokens() {
+    var text = textarea.value;
+    var tokens = [];
+    if (mode === 'word') {
+      var re = /\\S+/g;
+      var m;
+      while ((m = re.exec(text)) !== null) {
+        tokens.push({ text: m[0], start: m.index, end: m.index + m[0].length });
+      }
+    } else if (graphemeSegmenter) {
+      var segments = graphemeSegmenter.segment(text);
+      var iter = segments[Symbol.iterator]();
+      var step;
+      while (!(step = iter.next()).done) {
+        var seg = step.value;
+        if (seg.segment.trim() === '') continue;
+        tokens.push({ text: seg.segment, start: seg.index, end: seg.index + seg.segment.length });
+      }
+    }
+    return tokens;
+  }
+
+  // Render the gap between tokens as dim markers: one dot per extra space,
+  // one return arrow per newline.
+  function gapMarker(gapText, minSpaces) {
+    var spaces = (gapText.match(/ /g) || []).length;
+    var newlines = (gapText.match(/\\n/g) || []).length;
+    var label = '';
+    for (var i = 0; i < newlines; i++) label += '\\u21B5';
+    for (var j = 0; j < spaces - minSpaces; j++) label += '\\u00B7';
+    if (!label) return null;
+    var el = document.createElement('span');
+    el.className = 'font-mono text-xs text-lime-glow/70 tracking-widest';
+    el.textContent = label;
+    return el;
+  }
+
+  function buildChips() {
+    var text = textarea.value;
+    var tokens = getTokens();
+    tokenStrip.textContent = '';
+    if (selectedOrdinal !== null && selectedOrdinal >= tokens.length) {
+      selectedOrdinal = tokens.length ? tokens.length - 1 : null;
+    }
+    var betweenMin = mode === 'word' ? 1 : 0;
+    var prevEnd = 0;
+    tokens.forEach(function(token, i) {
+      // Edge gaps have no implicit separator, so every space there counts.
+      var marker = gapMarker(text.slice(prevEnd, token.start), i === 0 ? 0 : betweenMin);
+      if (marker) tokenStrip.appendChild(marker);
+      prevEnd = token.end;
+
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'rounded-lg border px-2 py-1 font-mono text-xs uppercase cursor-pointer transition-colors ' +
+        (i === selectedOrdinal
+          ? 'border-lime-glow text-lime-glow bg-lime-glow/10'
+          : 'border-border text-slate-300 hover:border-lime-glow/40');
+      chip.textContent = token.text;
+      chip.addEventListener('click', function() {
+        selectedOrdinal = i === selectedOrdinal ? null : i;
+        buildChips();
+      });
+      tokenStrip.appendChild(chip);
+    });
+    var trailing = gapMarker(text.slice(prevEnd), 0);
+    if (trailing) tokenStrip.appendChild(trailing);
+
+    var hasSelection = selectedOrdinal !== null;
+    actionBtns.forEach(function(btn) { btn.disabled = !hasSelection; });
+  }
+
+  function applyAction(action) {
+    if (selectedOrdinal === null) return;
+    var tokens = getTokens();
+    var token = tokens[selectedOrdinal];
+    if (!token) return;
+    var text = textarea.value;
+
+    if (action === 'space-before') {
+      text = text.slice(0, token.start) + ' ' + text.slice(token.start);
+    } else if (action === 'space-after') {
+      text = text.slice(0, token.end) + ' ' + text.slice(token.end);
+    } else if (action === 'unspace-before') {
+      if (text[token.start - 1] === ' ') {
+        text = text.slice(0, token.start - 1) + text.slice(token.start);
+      }
+    } else if (action === 'unspace-after') {
+      if (text[token.end] === ' ') {
+        text = text.slice(0, token.end) + text.slice(token.end + 1);
+      }
+    } else if (action === 'newline-before') {
+      text = text.slice(0, token.start) + '\\n' + text.slice(token.start);
+    } else if (action === 'newline-after') {
+      text = text.slice(0, token.end) + '\\n' + text.slice(token.end);
+    }
+
+    textarea.value = text;
+    buildChips();
+    schedulePreview();
+  }
+
+  function syncModeButtons() {
+    modeBtns.forEach(function(btn) {
+      if (btn.dataset.mode === mode) {
+        btn.classList.add('bg-lime-glow/15', 'text-lime-glow');
+        btn.classList.remove('text-slate-400');
+      } else {
+        btn.classList.remove('bg-lime-glow/15', 'text-lime-glow');
+        btn.classList.add('text-slate-400');
+      }
+    });
+  }
+
+  function setDimensionsLocked(locked) {
+    widthInput.disabled = locked;
+    heightInput.disabled = locked;
+    presetBtns.forEach(function(btn) { btn.disabled = locked; });
+  }
+
+  function enterEditor() {
+    if (editing) return;
+    editing = true;
+    heroSection.classList.add('hidden');
+    infoColumn.classList.add('hidden');
+    mainGrid.classList.remove('lg:grid-cols-5');
+    builderSection.classList.remove('lg:col-span-3');
+    enterRow.classList.add('hidden');
+    editorSection.classList.remove('hidden');
+    exitBtn.classList.remove('hidden');
+    exitBtn.classList.add('inline-flex');
+    setDimensionsLocked(true);
+    selectedOrdinal = null;
+    syncModeButtons();
+    buildChips();
+    updatePreview();
+  }
+
+  function exitEditor() {
+    if (!editing) return;
+    editing = false;
+    heroSection.classList.remove('hidden');
+    infoColumn.classList.remove('hidden');
+    mainGrid.classList.add('lg:grid-cols-5');
+    builderSection.classList.add('lg:col-span-3');
+    enterRow.classList.remove('hidden');
+    editorSection.classList.add('hidden');
+    exitBtn.classList.add('hidden');
+    exitBtn.classList.remove('inline-flex');
+    setDimensionsLocked(false);
+    iframe.src = 'about:blank';
+    iframe.dataset.src = '';
+  }
+
+  enterBtn.addEventListener('click', enterEditor);
+  exitBtn.addEventListener('click', exitEditor);
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.activeElement !== textarea) exitEditor();
   });
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeModal();
+  modeBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      mode = btn.dataset.mode;
+      selectedOrdinal = null;
+      syncModeButtons();
+      buildChips();
+    });
+  });
+
+  actionBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() { applyAction(btn.dataset.action); });
+  });
+
+  textarea.addEventListener('input', function() {
+    if (!editing) return;
+    buildChips();
+    schedulePreview();
+  });
+
+  form.querySelectorAll('input[type="radio"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (editing) schedulePreview();
+    });
+  });
+
+  rerollBtn.addEventListener('click', function() {
+    seed = Math.random().toString(36).slice(2, 10);
+    updatePreview();
+  });
+
+  window.addEventListener('resize', function() {
+    if (editing) schedulePreview();
   });
 })();
       `,

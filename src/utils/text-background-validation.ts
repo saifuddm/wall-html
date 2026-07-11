@@ -21,30 +21,36 @@ const parseString = (value?: string, fallback = DEFAULT_TEXT) => {
   return value;
 };
 
+const DEFAULT_SEED = "default";
+
 const validateRoute = ({
   width,
   height,
   displayText,
   randomTextToggle,
   cutOffTextToggle,
+  seed,
 }: {
   width?: string;
   height?: string;
   displayText?: string;
   randomTextToggle?: string;
   cutOffTextToggle?: string;
+  seed?: string;
 }) => {
   const parsedWidth = parseInteger(width);
   const parsedHeight = parseInteger(height);
   const parsedDisplayText = parseString(displayText);
   const parsedRandomTextToggle = parseBoolean(randomTextToggle);
   const parsedCutOffTextToggle = parseBoolean(cutOffTextToggle);
+  const parsedSeed = parseString(seed, DEFAULT_SEED);
   return {
     width: parsedWidth,
     height: parsedHeight,
     displayText: parsedDisplayText,
     randomTextToggle: parsedRandomTextToggle,
     cutOffTextToggle: parsedCutOffTextToggle,
+    seed: parsedSeed,
   };
 };
 

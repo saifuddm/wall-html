@@ -14,6 +14,7 @@ describe("buildTextBackgroundUrl", () => {
       displayText: "Hello world",
       randomTextToggle: true,
       cutOffTextToggle: false,
+      seed: "abc123",
     });
 
     const parsed = new URL(url);
@@ -24,6 +25,7 @@ describe("buildTextBackgroundUrl", () => {
     expect(parsed.searchParams.get("displayText")).toBe("Hello world");
     expect(parsed.searchParams.get("randomTextToggle")).toBe("true");
     expect(parsed.searchParams.get("cutOffTextToggle")).toBe("false");
+    expect(parsed.searchParams.get("seed")).toBe("abc123");
   });
 
   it("encodes special characters in displayText", () => {
@@ -34,6 +36,7 @@ describe("buildTextBackgroundUrl", () => {
       displayText: "Hello & goodbye 🪨",
       randomTextToggle: true,
       cutOffTextToggle: true,
+      seed: "default",
     });
 
     const parsed = new URL(url);
@@ -48,6 +51,7 @@ describe("buildTextBackgroundUrl", () => {
       displayText: "test",
       randomTextToggle: false,
       cutOffTextToggle: true,
+      seed: "default",
     });
 
     expect(url).toContain("http://localhost:5173/text-background");
